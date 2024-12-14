@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Send Audio to Mic</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 20px;
+    }
+    #audio-controls {
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Send Audio to Mic</h1>
+  <p>Select an audio file to play and simulate sending to microphone.</p>
+  
+  <input type="file" id="audioFile" accept="audio/*" />
+  <div id="audio-controls" style="display: none;">
+    <button id="playButton">Play</button>
+    <button id="stopButton" disabled>Stop</button>
+  </div>
+
+  <script>
+    let audioContext, audioBuffer, sourceNode;
+
+    const fileInput = document.getElementById("audioFile");
+    const playButton = document.getElementById("playButton");
+    const stopButton = document.getElementById("stopButton");
+    const audioControls = document.getElementById("audio-controls");
+
+    // Handle file upload
+    fileInput.addEventListener("change", async (event) => {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      // Initialize AudioContext
+      if (!audioContext) {
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      }
+
+      // Decode the audio file
+      const arrayBuffer = await file.arrayBuffer();
+      audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+
+      // Show controls
+      audioControls.style.display = "block";
+    });
+
+    // Play the audio
+    playButton.addEventListener("click", () => {
+      if (!audioBuffer) return;
+
+      // Create a source node
+      sourceNode = audioContext.createBufferSource();
+      sourceNode.buffer = audioBuffer;
+
+      // Connect to destination (audio output)
+      sourceNode.connect(audioContext.destination);
+
+      // Start playback
+      sourceNode.start(0);
+
+      // Update button states
+      playButton.disabled = true;
+      stopButton.disabled = false;
+    });
+
+    // Stop the audio
+    stopButton.addEventListener("click", () => {
+      if (sourceNode) {
+        sourceNode.stop();
+        sourceNode = null;
+      }
+
+      // Update button states
+      playButton.disabled = false;
+      stopButton.disabled = true;
+    });
+  </script>
+</body>
+</html>
