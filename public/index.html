@@ -5,61 +5,162 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Send Audio to Mic</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      padding: 20px;
+    :root {
+      --primary-color: #4caf50;
+      --primary-hover: #45a049;
+      --bg-color: #f9f9f9;
+      --text-color: #333;
+      --border-radius: 8px;
+      --padding: 16px;
     }
-    #audio-controls {
+
+    body {
+      margin: 0;
+      font-family: 'Arial', sans-serif;
+      color: var(--text-color);
+      background-color: var(--bg-color);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    main {
+      background: #fff;
+      padding: var(--padding);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      border-radius: var(--border-radius);
+      text-align: center;
+      width: 100%;
+      max-width: 400px;
+    }
+
+    h1 {
+      font-size: 1.8rem;
+      margin-bottom: 8px;
+      color: var(--primary-color);
+    }
+
+    p {
+      font-size: 1rem;
+      margin-bottom: 20px;
+    }
+
+    input[type="file"] {
+      display: none;
+    }
+
+    label {
+      display: inline-block;
+      padding: 10px 20px;
+      color: #fff;
+      background-color: var(--primary-color);
+      border: none;
+      border-radius: var(--border-radius);
+      cursor: pointer;
+      font-size: 1rem;
+      margin-bottom: 20px;
+      transition: background-color 0.3s ease;
+    }
+
+    label:hover {
+      background-color: var(--primary-hover);
+    }
+
+    .controls {
+      display: flex;
+      justify-content: space-between;
       margin-top: 20px;
+    }
+
+    button {
+      flex: 1;
+      padding: 10px;
+      margin: 0 5px;
+      font-size: 1rem;
+      color: #fff;
+      background-color: var(--primary-color);
+      border: none;
+      border-radius: var(--border-radius);
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: var(--primary-hover);
+    }
+
+    button:disabled {
+      background-color: #ccc;
+      cursor: not-allowed;
+    }
+
+    .file-info {
+      margin: 10px 0;
+      font-size: 0.9rem;
+      color: #555;
     }
   </style>
 </head>
 <body>
-  <h1>Send Audio to Mic</h1>
-  <p>Select an audio file to play and simulate sending to microphone.</p>
-  
-  <input type="file" id="audioFile" accept="audio/*" />
-  <div id="audio-controls" style="display: none;">
-    <button id="playButton">Play</button>
-    <button id="stopButton" disabled>Stop</button>
-  </div>
+  <main>
+    <h1>Send Audio to Mic</h1>
+    <p>Select an audio file and play it.</p>
+
+    <label for="audioFile">Choose Audio File</label>
+    <input type="file" id="audioFile" accept="audio/*" />
+
+    <div class="file-info" id="fileInfo">No file selected</div>
+
+    <div class="controls">
+      <button id="playButton" disabled>Play</button>
+      <button id="stopButton" disabled>Stop</button>
+    </div>
+  </main>
 
   <script>
-    let audioContext, audioBuffer, sourceNode;
-
-    const fileInput = document.getElementById("audioFile");
+    const audioFileInput = document.getElementById("audioFile");
     const playButton = document.getElementById("playButton");
     const stopButton = document.getElementById("stopButton");
-    const audioControls = document.getElementById("audio-controls");
+    const fileInfo = document.getElementById("fileInfo");
 
-    // Handle file upload
-    fileInput.addEventListener("change", async (event) => {
+    let audioContext, audioBuffer, sourceNode;
+
+    // Handle file selection
+    audioFileInput.addEventListener("change", async (event) => {
       const file = event.target.files[0];
       if (!file) return;
 
-      // Initialize AudioContext
+      // Display file name
+      fileInfo.textContent = `Selected: ${file.name}`;
+
+      // Initialize AudioContext if not already created
       if (!audioContext) {
         audioContext = new (window.AudioContext || window.webkitAudioContext)();
       }
 
-      // Decode the audio file
-      const arrayBuffer = await file.arrayBuffer();
-      audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+      try {
+        // Decode audio file
+        const arrayBuffer = await file.arrayBuffer();
+        audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
 
-      // Show controls
-      audioControls.style.display = "block";
+        // Enable the Play button
+        playButton.disabled = false;
+      } catch (error) {
+        fileInfo.textContent = "Error decoding audio file.";
+        console.error(error);
+      }
     });
 
     // Play the audio
     playButton.addEventListener("click", () => {
       if (!audioBuffer) return;
 
-      // Create a source node
+      // Create source node
       sourceNode = audioContext.createBufferSource();
       sourceNode.buffer = audioBuffer;
 
-      // Connect to destination (audio output)
+      // Connect to destination
       sourceNode.connect(audioContext.destination);
 
       // Start playback
@@ -68,12 +169,19 @@
       // Update button states
       playButton.disabled = true;
       stopButton.disabled = false;
+
+      // Handle playback end
+      sourceNode.onended = () => {
+        playButton.disabled = false;
+        stopButton.disabled = true;
+      };
     });
 
     // Stop the audio
     stopButton.addEventListener("click", () => {
       if (sourceNode) {
         sourceNode.stop();
+        sourceNode.disconnect();
         sourceNode = null;
       }
 
