@@ -3,211 +3,103 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Send Audio to Mic</title>
+  <title>Audio Device Selector</title>
   <style>
-    :root {
-      --primary-color: #4caf50;
-      --primary-hover: #45a049;
-      --bg-color: #f9f9f9;
-      --text-color: #333;
-      --border-radius: 8px;
-      --padding: 16px;
-    }
-
     body {
-      margin: 0;
-      font-family: 'Arial', sans-serif;
-      color: var(--text-color);
-      background-color: var(--bg-color);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-
-    main {
-      background: #fff;
-      padding: var(--padding);
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-      border-radius: var(--border-radius);
-      text-align: center;
-      width: 100%;
-      max-width: 400px;
+      font-family: Arial, sans-serif;
       margin: 20px;
     }
-
     h1 {
-      font-size: 1.8rem;
-      margin-bottom: 8px;
-      color: var(--primary-color);
+      color: #4caf50;
     }
-
-    p {
-      font-size: 1rem;
-      margin-bottom: 20px;
-    }
-
-    input[type="file"] {
-      display: none;
-    }
-
-    label {
-      display: inline-block;
-      padding: 10px 20px;
-      color: #fff;
-      background-color: var(--primary-color);
-      border: none;
-      border-radius: var(--border-radius);
-      cursor: pointer;
-      font-size: 1rem;
-      margin-bottom: 20px;
-      transition: background-color 0.3s ease;
-    }
-
-    label:hover {
-      background-color: var(--primary-hover);
-    }
-
-    .controls {
-      display: flex;
-      justify-content: space-between;
-      margin-top: 20px;
-    }
-
-    button {
-      flex: 1;
+    select, button {
       padding: 10px;
-      margin: 0 5px;
-      font-size: 1rem;
-      color: #fff;
-      background-color: var(--primary-color);
-      border: none;
-      border-radius: var(--border-radius);
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-    }
-
-    button:hover {
-      background-color: var(--primary-hover);
-    }
-
-    button:disabled {
-      background-color: #ccc;
-      cursor: not-allowed;
-    }
-
-    .file-info {
       margin: 10px 0;
-      font-size: 0.9rem;
-      color: #555;
+      font-size: 16px;
     }
-
-    section {
+    audio {
+      margin-top: 20px;
       width: 100%;
-      margin: 0; /* Remove margin to maximize space */
-    }
-
-    iframe {
-      width: 100%;
-      height: 100vh; /* Make iframe fill the full height of the viewport */
-      border: none;
     }
   </style>
 </head>
 <body>
-  <main>
-    <h1>Send Audio to Mic</h1>
-    <p>Select an audio file and play it.</p>
+  <h1>Audio Device Selector</h1>
 
-    <label for="audioFile">Choose Audio File</label>
-    <input type="file" id="audioFile" accept="audio/*" />
+  <div>
+    <label for="audioInputSelect">Select Microphone:</label>
+    <select id="audioInputSelect"></select>
+  </div>
 
-    <div class="file-info" id="fileInfo">No file selected</div>
+  <div>
+    <label for="audioOutputSelect">Select Speaker:</label>
+    <select id="audioOutputSelect"></select>
+  </div>
 
-    <div class="controls">
-      <button id="playButton" disabled>Play</button>
-      <button id="stopButton" disabled>Stop</button>
-    </div>
-  </main>
-
-  <section>
-    <iframe 
-      src="https://speechnotes.co/dictate/" 
-      title="Speechnotes"
-      allow="microphone; fullscreen">
-    </iframe>
-  </section>
+  <button id="startButton">Start Audio</button>
+  <audio id="audioPreview" controls></audio>
 
   <script>
-    const audioFileInput = document.getElementById("audioFile");
-    const playButton = document.getElementById("playButton");
-    const stopButton = document.getElementById("stopButton");
-    const fileInfo = document.getElementById("fileInfo");
+    const audioInputSelect = document.getElementById('audioInputSelect');
+    const audioOutputSelect = document.getElementById('audioOutputSelect');
+    const startButton = document.getElementById('startButton');
+    const audioPreview = document.getElementById('audioPreview');
 
-    let audioContext, audioBuffer, sourceNode;
+    // Populate audio device lists
+    async function updateDeviceLists() {
+      const devices = await navigator.mediaDevices.enumerateDevices();
 
-    // Handle file selection
-    audioFileInput.addEventListener("change", async (event) => {
-      const file = event.target.files[0];
-      if (!file) return;
+      // Clear existing options
+      audioInputSelect.innerHTML = '';
+      audioOutputSelect.innerHTML = '';
 
-      // Display file name
-      fileInfo.textContent = `Selected: ${file.name}`;
+      devices.forEach(device => {
+        const option = document.createElement('option');
+        option.value = device.deviceId;
+        option.textContent = device.label || `${device.kind} (ID: ${device.deviceId})`;
 
-      // Initialize AudioContext if not already created
-      if (!audioContext) {
-        audioContext = new (window.AudioContext || window.webkitAudioContext)();
-      }
+        if (device.kind === 'audioinput') {
+          audioInputSelect.appendChild(option);
+        } else if (device.kind === 'audiooutput') {
+          audioOutputSelect.appendChild(option);
+        }
+      });
+    }
+
+    // Start capturing audio from the selected input device
+    async function startAudio() {
+      const inputDeviceId = audioInputSelect.value;
+
+      const constraints = {
+        audio: { deviceId: inputDeviceId ? { exact: inputDeviceId } : undefined }
+      };
 
       try {
-        // Decode audio file
-        const arrayBuffer = await file.arrayBuffer();
-        audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+        const stream = await navigator.mediaDevices.getUserMedia(constraints);
+        audioPreview.srcObject = stream;
 
-        // Enable the Play button
-        playButton.disabled = false;
+        // Attach output device if supported
+        if (audioPreview.setSinkId) {
+          const outputDeviceId = audioOutputSelect.value;
+          if (outputDeviceId) {
+            await audioPreview.setSinkId(outputDeviceId);
+          }
+        } else {
+          console.warn('setSinkId not supported in this browser.');
+        }
       } catch (error) {
-        fileInfo.textContent = "Error decoding audio file.";
-        console.error(error);
+        console.error('Error accessing audio devices:', error);
       }
-    });
+    }
 
-    // Play the audio
-    playButton.addEventListener("click", () => {
-      if (!audioBuffer) return;
+    // Event listeners
+    startButton.addEventListener('click', startAudio);
 
-      // Create source node
-      sourceNode = audioContext.createBufferSource();
-      sourceNode.buffer = audioBuffer;
+    // Initialize device lists
+    navigator.mediaDevices.enumerateDevices().then(updateDeviceLists);
 
-      // Connect to destination
-      sourceNode.connect(audioContext.destination);
-
-      // Start playback
-      sourceNode.start(0);
-
-      // Update button states
-      playButton.disabled = true;
-      stopButton.disabled = false;
-
-      // Handle playback end
-      sourceNode.onended = () => {
-        playButton.disabled = false;
-        stopButton.disabled = true;
-      };
-    });
-
-    // Stop the audio
-    stopButton.addEventListener("click", () => {
-      if (sourceNode) {
-        sourceNode.stop();
-        sourceNode.disconnect();
-        sourceNode = null;
-      }
-
-      // Update button states
-      playButton.disabled = false;
-      stopButton.disabled = true;
-    });
+    // Update device lists when devices change
+    navigator.mediaDevices.addEventListener('devicechange', updateDeviceLists);
   </script>
 </body>
 </html>
