@@ -278,26 +278,44 @@
     });
 
     // Helper to start playback
-    function startPlayback(offset) {
-        sourceNode = audioContext.createBufferSource();
-        sourceNode.buffer = audioBuffer;
-
-        gainNode = audioContext.createGain();
-        gainNode.gain.value = volumeSlider.value;
-
-        sourceNode.connect(gainNode).connect(audioContext.destination);
-        startTime = audioContext.currentTime - offset;
-        sourceNode.start(0, offset);
+function startPlayback(offset) {
+    // Stop and disconnect any existing sourceNode
+    if (sourceNode) {
+        sourceNode.stop();
+        sourceNode.disconnect();
+        sourceNode = null;
     }
 
-    // Helper to stop playback
-    function stopPlayback() {
-        if (sourceNode) {
-            sourceNode.stop();
-            sourceNode.disconnect();
-            sourceNode = null;
-        }
+    sourceNode = audioContext.createBufferSource();
+    sourceNode.buffer = audioBuffer;
+
+    gainNode = audioContext.createGain();
+    gainNode.gain.value = volumeSlider.value;
+
+    sourceNode.connect(gainNode).connect(audioContext.destination);
+    startTime = audioContext.currentTime - offset;
+
+    sourceNode.start(0, offset);
+
+    // Handle playback end
+    sourceNode.onended = () => {
+        playButton.disabled = false;
+        stopButton.disabled = true;
+        pausedTime = 0; // Reset paused time
+        progressBar.value = 0; // Reset progress bar
+    };
+}
+
+// Helper to stop playback
+function stopPlayback() {
+    if (sourceNode) {
+        sourceNode.stop();
+        sourceNode.disconnect();
+        sourceNode = null;
     }
+    pausedTime = audioContext.currentTime - startTime;
+}
+
 
     // Format time to MM:SS
     function formatTime(seconds) {
