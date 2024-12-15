@@ -3,16 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Audio Device Selector</title>
+  <title>Audio Device Selector & Speechnotes</title>
   <style>
     body {
       font-family: Arial, sans-serif;
       margin: 20px;
+      line-height: 1.6;
     }
-    h1 {
+    h1, h2 {
       color: #4caf50;
     }
-    select, button {
+    select, button, input[type="file"] {
       padding: 10px;
       margin: 10px 0;
       font-size: 16px;
@@ -21,29 +22,46 @@
       margin-top: 20px;
       width: 100%;
     }
+    iframe {
+      width: 100%;
+      height: 600px;
+      border: none;
+      margin-top: 20px;
+    }
   </style>
 </head>
 <body>
-  <h1>Audio Device Selector</h1>
+  <h1>Audio Device Selector & Speechnotes</h1>
 
+  <!-- File Selection Section -->
+  <h2>Select an Audio File</h2>
+  <input type="file" id="audioFileInput" accept="audio/*">
+  <audio id="fileAudioPreview" controls></audio>
+
+  <!-- Audio Device Selector Section -->
+  <h2>Select Audio Devices</h2>
   <div>
-    <label for="audioInputSelect">Select Microphone:</label>
+    <label for="audioInputSelect">Microphone:</label>
     <select id="audioInputSelect"></select>
   </div>
-
   <div>
-    <label for="audioOutputSelect">Select Speaker:</label>
+    <label for="audioOutputSelect">Speaker:</label>
     <select id="audioOutputSelect"></select>
   </div>
+  <button id="startButton">Start Microphone Audio</button>
+  <audio id="microphoneAudioPreview" controls></audio>
 
-  <button id="startButton">Start Audio</button>
-  <audio id="audioPreview" controls></audio>
+  <!-- Speechnotes Integration -->
+  <h2>Speechnotes Dictation</h2>
+  <iframe src="https://speechnotes.co/dictate/" title="Speechnotes"></iframe>
 
   <script>
     const audioInputSelect = document.getElementById('audioInputSelect');
     const audioOutputSelect = document.getElementById('audioOutputSelect');
     const startButton = document.getElementById('startButton');
-    const audioPreview = document.getElementById('audioPreview');
+    const microphoneAudioPreview = document.getElementById('microphoneAudioPreview');
+    const audioFileInput = document.getElementById('audioFileInput');
+    const fileAudioPreview = document.getElementById('fileAudioPreview');
 
     // Populate audio device lists
     async function updateDeviceLists() {
@@ -76,13 +94,13 @@
 
       try {
         const stream = await navigator.mediaDevices.getUserMedia(constraints);
-        audioPreview.srcObject = stream;
+        microphoneAudioPreview.srcObject = stream;
 
         // Attach output device if supported
-        if (audioPreview.setSinkId) {
+        if (microphoneAudioPreview.setSinkId) {
           const outputDeviceId = audioOutputSelect.value;
           if (outputDeviceId) {
-            await audioPreview.setSinkId(outputDeviceId);
+            await microphoneAudioPreview.setSinkId(outputDeviceId);
           }
         } else {
           console.warn('setSinkId not supported in this browser.');
@@ -91,6 +109,15 @@
         console.error('Error accessing audio devices:', error);
       }
     }
+
+    // Handle audio file selection
+    audioFileInput.addEventListener('change', event => {
+      const file = event.target.files[0];
+      if (file) {
+        const objectURL = URL.createObjectURL(file);
+        fileAudioPreview.src = objectURL;
+      }
+    });
 
     // Event listeners
     startButton.addEventListener('click', startAudio);
