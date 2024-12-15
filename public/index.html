@@ -103,14 +103,13 @@
 
     section {
       width: 100%;
-      margin: 20px 0;
+      margin: 0; /* Remove margin to maximize space */
     }
 
     iframe {
       width: 100%;
-      height: calc(100vh - 300px); /* Adjusts iframe height dynamically */
+      height: 100vh; /* Make iframe fill the full height of the viewport */
       border: none;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     }
   </style>
 </head>
@@ -131,7 +130,6 @@
   </main>
 
   <section>
-    <h1>Speechnotes Integration</h1>
     <iframe 
       src="https://speechnotes.co/dictate/" 
       title="Speechnotes"
