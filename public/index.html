@@ -187,111 +187,123 @@
     const totalTimeDisplay = document.getElementById("totalTime");
     const volumeSlider = document.getElementById("volumeSlider");
 
-    let audioContext, audioBuffer, sourceNode, gainNode, startTime, pausedTime = 0, isDragging = false;
+    let audioContext, audioBuffer, sourceNode, gainNode;
+    let startTime = 0, pausedTime = 0, isDragging = false;
 
+    // Load and decode the audio file
     audioFileInput.addEventListener("change", async (event) => {
-      const file = event.target.files[0];
-      if (!file) return;
+        const file = event.target.files[0];
+        if (!file) return;
 
-      if (!file.type.startsWith("audio/")) {
-        fileInfo.textContent = "Please upload a valid audio file.";
-        return;
-      }
+        if (!file.type.startsWith("audio/")) {
+            fileInfo.textContent = "Please upload a valid audio file.";
+            return;
+        }
 
-      fileInfo.textContent = `נבחר: ${file.name}`;
+        fileInfo.textContent = `נבחר: ${file.name}`;
 
-      if (!audioContext) {
-        audioContext = new (window.AudioContext || window.webkitAudioContext)();
-      }
+        if (!audioContext) {
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        }
 
-      try {
-        const arrayBuffer = await file.arrayBuffer();
-        audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+        try {
+            const arrayBuffer = await file.arrayBuffer();
+            audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
 
-        totalTimeDisplay.textContent = formatTime(audioBuffer.duration);
-        playButton.disabled = false;
-      } catch (error) {
-        fileInfo.textContent = "Error decoding audio file.";
-        console.error(error);
-      }
+            totalTimeDisplay.textContent = formatTime(audioBuffer.duration);
+            progressBar.max = Math.floor(audioBuffer.duration);
+            playButton.disabled = false;
+        } catch (error) {
+            fileInfo.textContent = "Error decoding audio file.";
+            console.error(error);
+        }
     });
 
+    // Play the audio
     playButton.addEventListener("click", () => {
-      if (!audioBuffer) return;
+        if (!audioBuffer) return;
 
-      sourceNode = audioContext.createBufferSource();
-      sourceNode.buffer = audioBuffer;
+        startPlayback(pausedTime);
+        playButton.disabled = true;
+        stopButton.disabled = false;
 
-      gainNode = audioContext.createGain();
-      gainNode.gain.value = volumeSlider.value;
+        const progressInterval = setInterval(() => {
+            if (sourceNode && !isDragging) {
+                const currentTime = audioContext.currentTime - startTime;
+                currentTimeDisplay.textContent = formatTime(currentTime);
+                progressBar.value = Math.floor(currentTime);
+            }
+        }, 500);
 
-      sourceNode.connect(gainNode).connect(audioContext.destination);
-      
-      const offset = pausedTime || 0;
-      sourceNode.start(0, offset);
-      startTime = audioContext.currentTime - offset;
-      pausedTime = 0;
+        sourceNode.onended = () => {
+            clearInterval(progressInterval);
+            playButton.disabled = false;
+            stopButton.disabled = true;
+            pausedTime = 0;
+            progressBar.value = 0;
+        };
+    });
 
-      playButton.disabled = true;
-      stopButton.disabled = false;
-
-      const progressInterval = setInterval(() => {
-        if (!isDragging) {
-          const currentTime = audioContext.currentTime - startTime;
-          currentTimeDisplay.textContent = formatTime(currentTime);
-          progressBar.value = (currentTime / audioBuffer.duration) * 100;
-        }
-      }, 500);
-
-      sourceNode.onended = () => {
-        clearInterval(progressInterval);
+    // Stop the audio
+    stopButton.addEventListener("click", () => {
+        stopPlayback();
+        pausedTime = audioContext.currentTime - startTime;
         playButton.disabled = false;
         stopButton.disabled = true;
-        pausedTime = 0;
-      };
     });
 
-    stopButton.addEventListener("click", () => {
-      if (sourceNode) {
-        sourceNode.stop();
-        sourceNode.disconnect();
-        sourceNode = null;
-      }
-
-      pausedTime = audioContext.currentTime - startTime;
-      playButton.disabled = false;
-      stopButton.disabled = true;
-    });
-
+    // Update slider while dragging
     progressBar.addEventListener("input", (event) => {
-      isDragging = true;
-      const seekTime = (event.target.value / 100) * audioBuffer.duration;
-      currentTimeDisplay.textContent = formatTime(seekTime);
+        isDragging = true;
+        const seekTime = event.target.value;
+        currentTimeDisplay.textContent = formatTime(seekTime);
     });
 
+    // Seek to new time when slider changes
     progressBar.addEventListener("change", (event) => {
-      const seekTime = (event.target.value / 100) * audioBuffer.duration;
-      pausedTime = seekTime;
-      if (sourceNode) {
-        sourceNode.stop();
-        sourceNode.disconnect();
-        sourceNode = null;
-      }
-      isDragging = false;
-      playButton.disabled = false;
-      stopButton.disabled = true;
+        const seekTime = event.target.value;
+        pausedTime = seekTime;
+        if (sourceNode) {
+            stopPlayback();
+        }
+        startPlayback(pausedTime);
+        isDragging = false;
     });
 
+    // Adjust volume
     volumeSlider.addEventListener("input", () => {
-      if (gainNode) {
-        gainNode.gain.value = volumeSlider.value;
-      }
+        if (gainNode) {
+            gainNode.gain.value = volumeSlider.value;
+        }
     });
 
+    // Helper to start playback
+    function startPlayback(offset) {
+        sourceNode = audioContext.createBufferSource();
+        sourceNode.buffer = audioBuffer;
+
+        gainNode = audioContext.createGain();
+        gainNode.gain.value = volumeSlider.value;
+
+        sourceNode.connect(gainNode).connect(audioContext.destination);
+        startTime = audioContext.currentTime - offset;
+        sourceNode.start(0, offset);
+    }
+
+    // Helper to stop playback
+    function stopPlayback() {
+        if (sourceNode) {
+            sourceNode.stop();
+            sourceNode.disconnect();
+            sourceNode = null;
+        }
+    }
+
+    // Format time to MM:SS
     function formatTime(seconds) {
-      const minutes = Math.floor(seconds / 60);
-      seconds = Math.floor(seconds % 60);
-      return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
+        const minutes = Math.floor(seconds / 60);
+        seconds = Math.floor(seconds % 60);
+        return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
     }
   </script>
 </body>
