@@ -115,17 +115,17 @@
 </head>
 <body>
   <main>
-    <h1>Send Audio to Mic</h1>
-    <p>Select an audio file and play it.</p>
+    <h1>שליחת שמע למיקופון</h1>
+    <p>בחר קובץ שמע ונגן אותו.</p>
 
     <label for="audioFile">Choose Audio File</label>
     <input type="file" id="audioFile" accept="audio/*" />
 
-    <div class="file-info" id="fileInfo">No file selected</div>
+    <div class="file-info" id="fileInfo">לא נבחר קובץ</div>
 
     <div class="controls">
-      <button id="playButton" disabled>Play</button>
-      <button id="stopButton" disabled>Stop</button>
+      <button id="playButton" disabled>נגן</button>
+      <button id="stopButton" disabled>עצור</button>
     </div>
   </main>
 
@@ -151,7 +151,7 @@
       if (!file) return;
 
       // Display file name
-      fileInfo.textContent = `Selected: ${file.name}`;
+      fileInfo.textContent = `נבחר: ${file.name}`;
 
       // Initialize AudioContext if not already created
       if (!audioContext) {
