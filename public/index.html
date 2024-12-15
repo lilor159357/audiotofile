@@ -3,111 +3,211 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>File to Mic Input</title>
+  <title>Send Audio to Mic</title>
   <style>
+    :root {
+      --primary-color: #4caf50;
+      --primary-hover: #45a049;
+      --bg-color: #f9f9f9;
+      --text-color: #333;
+      --border-radius: 8px;
+      --padding: 16px;
+    }
+
     body {
-      font-family: Arial, sans-serif;
+      margin: 0;
+      font-family: 'Arial', sans-serif;
+      color: var(--text-color);
+      background-color: var(--bg-color);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    main {
+      background: #fff;
+      padding: var(--padding);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      border-radius: var(--border-radius);
+      text-align: center;
+      width: 100%;
+      max-width: 400px;
       margin: 20px;
     }
-    h1, h2 {
-      color: #4caf50;
+
+    h1 {
+      font-size: 1.8rem;
+      margin-bottom: 8px;
+      color: var(--primary-color);
     }
-    input, select, button, audio {
-      margin: 10px 0;
+
+    p {
+      font-size: 1rem;
+      margin-bottom: 20px;
+    }
+
+    input[type="file"] {
+      display: none;
+    }
+
+    label {
+      display: inline-block;
+      padding: 10px 20px;
+      color: #fff;
+      background-color: var(--primary-color);
+      border: none;
+      border-radius: var(--border-radius);
+      cursor: pointer;
+      font-size: 1rem;
+      margin-bottom: 20px;
+      transition: background-color 0.3s ease;
+    }
+
+    label:hover {
+      background-color: var(--primary-hover);
+    }
+
+    .controls {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 20px;
+    }
+
+    button {
+      flex: 1;
       padding: 10px;
-      font-size: 16px;
+      margin: 0 5px;
+      font-size: 1rem;
+      color: #fff;
+      background-color: var(--primary-color);
+      border: none;
+      border-radius: var(--border-radius);
+      cursor: pointer;
+      transition: background-color 0.3s ease;
     }
+
+    button:hover {
+      background-color: var(--primary-hover);
+    }
+
+    button:disabled {
+      background-color: #ccc;
+      cursor: not-allowed;
+    }
+
+    .file-info {
+      margin: 10px 0;
+      font-size: 0.9rem;
+      color: #555;
+    }
+
+    section {
+      width: 100%;
+      margin: 0; /* Remove margin to maximize space */
+    }
+
     iframe {
       width: 100%;
-      height: 600px;
+      height: 100vh; /* Make iframe fill the full height of the viewport */
       border: none;
-      margin-top: 20px;
     }
   </style>
 </head>
 <body>
-  <h1>Send Audio File to Microphone Input</h1>
-  
-  <!-- File Selection Section -->
-  <h2>Step 1: Upload and Play an Audio File</h2>
-  <input type="file" id="audioFileInput" accept="audio/*">
-  <audio id="audioPlayer" controls></audio>
+  <main>
+    <h1>Send Audio to Mic</h1>
+    <p>Select an audio file and play it.</p>
 
-  <!-- Audio Device Selection Section -->
-  <h2>Step 2: Select Output (VB-CABLE) and Input Devices</h2>
-  <div>
-    <label for="audioOutputSelect">Output Device (e.g., VB-CABLE):</label>
-    <select id="audioOutputSelect"></select>
-  </div>
-  <div>
-    <label for="audioInputSelect">Input Device (e.g., VB-CABLE):</label>
-    <select id="audioInputSelect"></select>
-  </div>
-  <button id="startButton">Start Audio Routing</button>
+    <label for="audioFile">Choose Audio File</label>
+    <input type="file" id="audioFile" accept="audio/*" />
 
-  <!-- Speechnotes Integration -->
-  <h2>Step 3: Open Speechnotes for Transcription</h2>
-  <iframe src="https://speechnotes.co/dictate/" title="Speechnotes"></iframe>
+    <div class="file-info" id="fileInfo">No file selected</div>
+
+    <div class="controls">
+      <button id="playButton" disabled>Play</button>
+      <button id="stopButton" disabled>Stop</button>
+    </div>
+  </main>
+
+  <section>
+    <iframe 
+      src="https://speechnotes.co/dictate/" 
+      title="Speechnotes"
+      allow="microphone; fullscreen">
+    </iframe>
+  </section>
 
   <script>
-    const audioFileInput = document.getElementById('audioFileInput');
-    const audioPlayer = document.getElementById('audioPlayer');
-    const audioOutputSelect = document.getElementById('audioOutputSelect');
-    const audioInputSelect = document.getElementById('audioInputSelect');
-    const startButton = document.getElementById('startButton');
+    const audioFileInput = document.getElementById("audioFile");
+    const playButton = document.getElementById("playButton");
+    const stopButton = document.getElementById("stopButton");
+    const fileInfo = document.getElementById("fileInfo");
 
-    // Populate audio device lists
-    async function populateDeviceLists() {
-      const devices = await navigator.mediaDevices.enumerateDevices();
+    let audioContext, audioBuffer, sourceNode;
 
-      audioOutputSelect.innerHTML = '';
-      audioInputSelect.innerHTML = '';
-
-      devices.forEach(device => {
-        const option = document.createElement('option');
-        option.value = device.deviceId;
-        option.textContent = device.label || `${device.kind} (ID: ${device.deviceId})`;
-
-        if (device.kind === 'audiooutput') {
-          audioOutputSelect.appendChild(option);
-        } else if (device.kind === 'audioinput') {
-          audioInputSelect.appendChild(option);
-        }
-      });
-    }
-
-    // Play uploaded audio file
-    audioFileInput.addEventListener('change', (event) => {
+    // Handle file selection
+    audioFileInput.addEventListener("change", async (event) => {
       const file = event.target.files[0];
-      if (file) {
-        const objectURL = URL.createObjectURL(file);
-        audioPlayer.src = objectURL;
-      }
-    });
+      if (!file) return;
 
-    // Route audio output to VB-CABLE
-    startButton.addEventListener('click', async () => {
+      // Display file name
+      fileInfo.textContent = `Selected: ${file.name}`;
+
+      // Initialize AudioContext if not already created
+      if (!audioContext) {
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      }
+
       try {
-        const outputDeviceId = audioOutputSelect.value;
+        // Decode audio file
+        const arrayBuffer = await file.arrayBuffer();
+        audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
 
-        // Attach output device
-        if (audioPlayer.setSinkId) {
-          await audioPlayer.setSinkId(outputDeviceId);
-          console.log('Audio output routed to:', outputDeviceId);
-        } else {
-          console.warn('setSinkId not supported in this browser.');
-        }
-
-        // Inform user to configure mic
-        alert('Make sure to set VB-CABLE as your microphone input in Windows Sound Settings.');
+        // Enable the Play button
+        playButton.disabled = false;
       } catch (error) {
-        console.error('Error routing audio output:', error);
+        fileInfo.textContent = "Error decoding audio file.";
+        console.error(error);
       }
     });
 
-    // Initialize device lists
-    populateDeviceLists();
-    navigator.mediaDevices.addEventListener('devicechange', populateDeviceLists);
+    // Play the audio
+    playButton.addEventListener("click", () => {
+      if (!audioBuffer) return;
+
+      // Create source node
+      sourceNode = audioContext.createBufferSource();
+      sourceNode.buffer = audioBuffer;
+
+      // Connect to destination
+      sourceNode.connect(audioContext.destination);
+
+      // Start playback
+      sourceNode.start(0);
+
+      // Update button states
+      playButton.disabled = true;
+      stopButton.disabled = false;
+
+      // Handle playback end
+      sourceNode.onended = () => {
+        playButton.disabled = false;
+        stopButton.disabled = true;
+      };
+    });
+
+    // Stop the audio
+    stopButton.addEventListener("click", () => {
+      if (sourceNode) {
+        sourceNode.stop();
+        sourceNode.disconnect();
+        sourceNode = null;
+      }
+
+      // Update button states
+      playButton.disabled = false;
+      stopButton.disabled = true;
+    });
   </script>
 </body>
 </html>
