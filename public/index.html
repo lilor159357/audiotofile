@@ -187,7 +187,7 @@
     const totalTimeDisplay = document.getElementById("totalTime");
     const volumeSlider = document.getElementById("volumeSlider");
 
-    let audioContext, audioBuffer, sourceNode, gainNode, startTime;
+    let audioContext, audioBuffer, sourceNode, gainNode, startTime, pausedTime = 0, isDragging = false;
 
     audioFileInput.addEventListener("change", async (event) => {
       const file = event.target.files[0];
@@ -226,22 +226,28 @@
       gainNode.gain.value = volumeSlider.value;
 
       sourceNode.connect(gainNode).connect(audioContext.destination);
-      sourceNode.start(0);
-      startTime = audioContext.currentTime;
+      
+      const offset = pausedTime || 0;
+      sourceNode.start(0, offset);
+      startTime = audioContext.currentTime - offset;
+      pausedTime = 0;
 
       playButton.disabled = true;
       stopButton.disabled = false;
 
       const progressInterval = setInterval(() => {
-        const currentTime = audioContext.currentTime - startTime;
-        currentTimeDisplay.textContent = formatTime(currentTime);
-        progressBar.value = (currentTime / audioBuffer.duration) * 100;
+        if (!isDragging) {
+          const currentTime = audioContext.currentTime - startTime;
+          currentTimeDisplay.textContent = formatTime(currentTime);
+          progressBar.value = (currentTime / audioBuffer.duration) * 100;
+        }
       }, 500);
 
       sourceNode.onended = () => {
         clearInterval(progressInterval);
         playButton.disabled = false;
         stopButton.disabled = true;
+        pausedTime = 0;
       };
     });
 
@@ -252,6 +258,26 @@
         sourceNode = null;
       }
 
+      pausedTime = audioContext.currentTime - startTime;
+      playButton.disabled = false;
+      stopButton.disabled = true;
+    });
+
+    progressBar.addEventListener("input", (event) => {
+      isDragging = true;
+      const seekTime = (event.target.value / 100) * audioBuffer.duration;
+      currentTimeDisplay.textContent = formatTime(seekTime);
+    });
+
+    progressBar.addEventListener("change", (event) => {
+      const seekTime = (event.target.value / 100) * audioBuffer.duration;
+      pausedTime = seekTime;
+      if (sourceNode) {
+        sourceNode.stop();
+        sourceNode.disconnect();
+        sourceNode = null;
+      }
+      isDragging = false;
       playButton.disabled = false;
       stopButton.disabled = true;
     });
