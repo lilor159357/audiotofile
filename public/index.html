@@ -3,24 +3,19 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Audio Device Selector & Speechnotes</title>
+  <title>File to Mic Input</title>
   <style>
     body {
       font-family: Arial, sans-serif;
       margin: 20px;
-      line-height: 1.6;
     }
     h1, h2 {
       color: #4caf50;
     }
-    select, button, input[type="file"] {
-      padding: 10px;
+    input, select, button, audio {
       margin: 10px 0;
+      padding: 10px;
       font-size: 16px;
-    }
-    audio {
-      margin-top: 20px;
-      width: 100%;
     }
     iframe {
       width: 100%;
@@ -31,102 +26,88 @@
   </style>
 </head>
 <body>
-  <h1>Audio Device Selector & Speechnotes</h1>
-
+  <h1>Send Audio File to Microphone Input</h1>
+  
   <!-- File Selection Section -->
-  <h2>Select an Audio File</h2>
+  <h2>Step 1: Upload and Play an Audio File</h2>
   <input type="file" id="audioFileInput" accept="audio/*">
-  <audio id="fileAudioPreview" controls></audio>
+  <audio id="audioPlayer" controls></audio>
 
-  <!-- Audio Device Selector Section -->
-  <h2>Select Audio Devices</h2>
+  <!-- Audio Device Selection Section -->
+  <h2>Step 2: Select Output (VB-CABLE) and Input Devices</h2>
   <div>
-    <label for="audioInputSelect">Microphone:</label>
-    <select id="audioInputSelect"></select>
-  </div>
-  <div>
-    <label for="audioOutputSelect">Speaker:</label>
+    <label for="audioOutputSelect">Output Device (e.g., VB-CABLE):</label>
     <select id="audioOutputSelect"></select>
   </div>
-  <button id="startButton">Start Microphone Audio</button>
-  <audio id="microphoneAudioPreview" controls></audio>
+  <div>
+    <label for="audioInputSelect">Input Device (e.g., VB-CABLE):</label>
+    <select id="audioInputSelect"></select>
+  </div>
+  <button id="startButton">Start Audio Routing</button>
 
   <!-- Speechnotes Integration -->
-  <h2>Speechnotes Dictation</h2>
+  <h2>Step 3: Open Speechnotes for Transcription</h2>
   <iframe src="https://speechnotes.co/dictate/" title="Speechnotes"></iframe>
 
   <script>
-    const audioInputSelect = document.getElementById('audioInputSelect');
-    const audioOutputSelect = document.getElementById('audioOutputSelect');
-    const startButton = document.getElementById('startButton');
-    const microphoneAudioPreview = document.getElementById('microphoneAudioPreview');
     const audioFileInput = document.getElementById('audioFileInput');
-    const fileAudioPreview = document.getElementById('fileAudioPreview');
+    const audioPlayer = document.getElementById('audioPlayer');
+    const audioOutputSelect = document.getElementById('audioOutputSelect');
+    const audioInputSelect = document.getElementById('audioInputSelect');
+    const startButton = document.getElementById('startButton');
 
     // Populate audio device lists
-    async function updateDeviceLists() {
+    async function populateDeviceLists() {
       const devices = await navigator.mediaDevices.enumerateDevices();
 
-      // Clear existing options
-      audioInputSelect.innerHTML = '';
       audioOutputSelect.innerHTML = '';
+      audioInputSelect.innerHTML = '';
 
       devices.forEach(device => {
         const option = document.createElement('option');
         option.value = device.deviceId;
         option.textContent = device.label || `${device.kind} (ID: ${device.deviceId})`;
 
-        if (device.kind === 'audioinput') {
-          audioInputSelect.appendChild(option);
-        } else if (device.kind === 'audiooutput') {
+        if (device.kind === 'audiooutput') {
           audioOutputSelect.appendChild(option);
+        } else if (device.kind === 'audioinput') {
+          audioInputSelect.appendChild(option);
         }
       });
     }
 
-    // Start capturing audio from the selected input device
-    async function startAudio() {
-      const inputDeviceId = audioInputSelect.value;
-
-      const constraints = {
-        audio: { deviceId: inputDeviceId ? { exact: inputDeviceId } : undefined }
-      };
-
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia(constraints);
-        microphoneAudioPreview.srcObject = stream;
-
-        // Attach output device if supported
-        if (microphoneAudioPreview.setSinkId) {
-          const outputDeviceId = audioOutputSelect.value;
-          if (outputDeviceId) {
-            await microphoneAudioPreview.setSinkId(outputDeviceId);
-          }
-        } else {
-          console.warn('setSinkId not supported in this browser.');
-        }
-      } catch (error) {
-        console.error('Error accessing audio devices:', error);
-      }
-    }
-
-    // Handle audio file selection
-    audioFileInput.addEventListener('change', event => {
+    // Play uploaded audio file
+    audioFileInput.addEventListener('change', (event) => {
       const file = event.target.files[0];
       if (file) {
         const objectURL = URL.createObjectURL(file);
-        fileAudioPreview.src = objectURL;
+        audioPlayer.src = objectURL;
       }
     });
 
-    // Event listeners
-    startButton.addEventListener('click', startAudio);
+    // Route audio output to VB-CABLE
+    startButton.addEventListener('click', async () => {
+      try {
+        const outputDeviceId = audioOutputSelect.value;
+
+        // Attach output device
+        if (audioPlayer.setSinkId) {
+          await audioPlayer.setSinkId(outputDeviceId);
+          console.log('Audio output routed to:', outputDeviceId);
+        } else {
+          console.warn('setSinkId not supported in this browser.');
+        }
+
+        // Inform user to configure mic
+        alert('Make sure to set VB-CABLE as your microphone input in Windows Sound Settings.');
+      } catch (error) {
+        console.error('Error routing audio output:', error);
+      }
+    });
 
     // Initialize device lists
-    navigator.mediaDevices.enumerateDevices().then(updateDeviceLists);
-
-    // Update device lists when devices change
-    navigator.mediaDevices.addEventListener('devicechange', updateDeviceLists);
+    populateDeviceLists();
+    navigator.mediaDevices.addEventListener('devicechange', populateDeviceLists);
   </script>
 </body>
 </html>
