@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -101,44 +102,15 @@
       color: #555;
     }
 
-    .progress-container {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-top: 20px;
-    }
-
-    input[type="range"] {
-      flex: 1;
-      cursor: pointer;
-    }
-
-    .volume-control {
-      display: flex;
-      align-items: center;
-      margin-top: 10px;
-    }
-
-    .volume-control label {
-      margin-right: 10px;
-    }
-
     section {
       width: 100%;
-      margin: 0;
+      margin: 0; /* Remove margin to maximize space */
     }
 
     iframe {
       width: 100%;
-      height: 100vh;
+      height: 100vh; /* Make iframe fill the full height of the viewport */
       border: none;
-    }
-
-    @media (max-width: 600px) {
-      .controls {
-        flex-direction: column;
-        gap: 10px;
-      }
     }
   </style>
 </head>
@@ -156,17 +128,6 @@
       <button id="playButton" disabled>נגן</button>
       <button id="stopButton" disabled>עצור</button>
     </div>
-
-    <div class="progress-container">
-      <span id="currentTime">00:00</span>
-      <input type="range" id="progressBar" value="0" min="0" max="100" />
-      <span id="totalTime">00:00</span>
-    </div>
-
-    <div class="volume-control">
-      <label for="volumeSlider">Volume</label>
-      <input type="range" id="volumeSlider" min="0" max="1" step="0.01" value="1" />
-    </div>
   </main>
 
   <section>
@@ -182,33 +143,28 @@
     const playButton = document.getElementById("playButton");
     const stopButton = document.getElementById("stopButton");
     const fileInfo = document.getElementById("fileInfo");
-    const progressBar = document.getElementById("progressBar");
-    const currentTimeDisplay = document.getElementById("currentTime");
-    const totalTimeDisplay = document.getElementById("totalTime");
-    const volumeSlider = document.getElementById("volumeSlider");
 
-    let audioContext, audioBuffer, sourceNode, gainNode, startTime;
+    let audioContext, audioBuffer, sourceNode;
 
+    // Handle file selection
     audioFileInput.addEventListener("change", async (event) => {
       const file = event.target.files[0];
       if (!file) return;
 
-      if (!file.type.startsWith("audio/")) {
-        fileInfo.textContent = "Please upload a valid audio file.";
-        return;
-      }
-
+      // Display file name
       fileInfo.textContent = `נבחר: ${file.name}`;
 
+      // Initialize AudioContext if not already created
       if (!audioContext) {
         audioContext = new (window.AudioContext || window.webkitAudioContext)();
       }
 
       try {
+        // Decode audio file
         const arrayBuffer = await file.arrayBuffer();
         audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
 
-        totalTimeDisplay.textContent = formatTime(audioBuffer.duration);
+        // Enable the Play button
         playButton.disabled = false;
       } catch (error) {
         fileInfo.textContent = "Error decoding audio file.";
@@ -216,35 +172,32 @@
       }
     });
 
+    // Play the audio
     playButton.addEventListener("click", () => {
       if (!audioBuffer) return;
 
+      // Create source node
       sourceNode = audioContext.createBufferSource();
       sourceNode.buffer = audioBuffer;
 
-      gainNode = audioContext.createGain();
-      gainNode.gain.value = volumeSlider.value;
+      // Connect to destination
+      sourceNode.connect(audioContext.destination);
 
-      sourceNode.connect(gainNode).connect(audioContext.destination);
+      // Start playback
       sourceNode.start(0);
-      startTime = audioContext.currentTime;
 
+      // Update button states
       playButton.disabled = true;
       stopButton.disabled = false;
 
-      const progressInterval = setInterval(() => {
-        const currentTime = audioContext.currentTime - startTime;
-        currentTimeDisplay.textContent = formatTime(currentTime);
-        progressBar.value = (currentTime / audioBuffer.duration) * 100;
-      }, 500);
-
+      // Handle playback end
       sourceNode.onended = () => {
-        clearInterval(progressInterval);
         playButton.disabled = false;
         stopButton.disabled = true;
       };
     });
 
+    // Stop the audio
     stopButton.addEventListener("click", () => {
       if (sourceNode) {
         sourceNode.stop();
@@ -252,21 +205,10 @@
         sourceNode = null;
       }
 
+      // Update button states
       playButton.disabled = false;
       stopButton.disabled = true;
     });
-
-    volumeSlider.addEventListener("input", () => {
-      if (gainNode) {
-        gainNode.gain.value = volumeSlider.value;
-      }
-    });
-
-    function formatTime(seconds) {
-      const minutes = Math.floor(seconds / 60);
-      seconds = Math.floor(seconds % 60);
-      return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
-    }
   </script>
 </body>
 </html>
