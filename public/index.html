@@ -95,22 +95,6 @@
       cursor: not-allowed;
     }
 
-    /* For the play button when it's active (not disabled) */
-    #playButton:not(:disabled) {
-      background-color: var(--primary-color);
-    }
-
-    /* For the stop button when it's active (not disabled) */
-    #stopButton:not(:disabled) {
-      background-color: var(--primary-color);
-    }
-
-    /* Adjust stop button when it's disabled */
-    #stopButton:disabled {
-      background-color: #ccc;
-      cursor: not-allowed;
-    }
-
     .file-info {
       margin: 10px 0;
       font-size: 0.9rem;
@@ -149,8 +133,7 @@
       height: 100vh;
       border: none;
     }
-
-   </style>
+  </style>
 </head>
 <body>
   <main>
@@ -207,6 +190,7 @@
 
     let audioContext, audioBuffer, sourceNode, gainNode;
     let startTime = 0, pausedTime = 0, isPlaying = false;
+    let lastTime = 0;
 
     // Load and decode the audio file
     audioFileInput.addEventListener("change", async (event) => {
@@ -245,7 +229,7 @@
         if (!audioBuffer) return;
 
         if (!isPlaying) {
-            startPlayback(pausedTime);  // Start from the current paused time
+            startPlayback(pausedTime);
             playButton.disabled = true;
             stopButton.disabled = false;
             isPlaying = true;
