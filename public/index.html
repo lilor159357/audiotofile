@@ -95,6 +95,22 @@
       cursor: not-allowed;
     }
 
+    /* For the play button when it's active (not disabled) */
+    #playButton:not(:disabled) {
+      background-color: var(--primary-color);
+    }
+
+    /* For the stop button when it's active (not disabled) */
+    #stopButton:not(:disabled) {
+      background-color: var(--primary-color);
+    }
+
+    /* Adjust stop button when it's disabled */
+    #stopButton:disabled {
+      background-color: #ccc;
+      cursor: not-allowed;
+    }
+
     .file-info {
       margin: 10px 0;
       font-size: 0.9rem;
@@ -133,6 +149,7 @@
       height: 100vh;
       border: none;
     }
+
   </style>
 </head>
 <body>
@@ -190,7 +207,6 @@
 
     let audioContext, audioBuffer, sourceNode, gainNode;
     let startTime = 0, pausedTime = 0, isPlaying = false;
-    let lastTime = 0;
 
     // Load and decode the audio file
     audioFileInput.addEventListener("change", async (event) => {
@@ -229,10 +245,14 @@
         if (!audioBuffer) return;
 
         if (!isPlaying) {
-            startPlayback(pausedTime);
+            startPlayback(pausedTime);  // Start from the current paused time
             playButton.disabled = true;
             stopButton.disabled = false;
             isPlaying = true;
+
+            // Change button colors
+            playButton.style.backgroundColor = "#ccc";  // Disabled Play button color
+            stopButton.style.backgroundColor = "#4caf50";  // Active Stop button color
         }
     });
 
@@ -242,61 +262,65 @@
         playButton.disabled = false;
         stopButton.disabled = true;
         isPlaying = false;
+
+        // Change button colors
+        playButton.style.backgroundColor = "#4caf50";  // Active Play button color
+        stopButton.style.backgroundColor = "#ccc";  // Disabled Stop button color
     });
 
     // Skip 10 seconds backward
-skipBack10.addEventListener("click", () => {
-  if (!audioBuffer) return;
+    skipBack10.addEventListener("click", () => {
+        if (!audioBuffer) return;
 
-  const newTime = Math.max(pausedTime - 10, 0);
-  pausedTime = newTime;
-  stopPlayback();
-  startPlayback(newTime); // Start playback from the new time
-});
+        const newTime = Math.max(pausedTime - 10, 0);
+        pausedTime = newTime;
+        stopPlayback();
+        startPlayback(newTime);
+    });
 
-// Skip 30 seconds backward
-skipBack30.addEventListener("click", () => {
-  if (!audioBuffer) return;
+    // Skip 30 seconds backward
+    skipBack30.addEventListener("click", () => {
+        if (!audioBuffer) return;
 
-  const newTime = Math.max(pausedTime - 30, 0);
-  pausedTime = newTime;
-  stopPlayback();
-  startPlayback(newTime); // Start playback from the new time
-});
+        const newTime = Math.max(pausedTime - 30, 0);
+        pausedTime = newTime;
+        stopPlayback();
+        startPlayback(newTime);
+    });
 
-// Skip 10 seconds forward
-skipForward10.addEventListener("click", () => {
-  if (!audioBuffer) return;
+    // Skip 10 seconds forward
+    skipForward10.addEventListener("click", () => {
+        if (!audioBuffer) return;
 
-  const newTime = Math.min(pausedTime + 10, audioBuffer.duration);
-  pausedTime = newTime;
-  stopPlayback();
-  startPlayback(newTime); // Start playback from the new time
-});
+        const newTime = Math.min(pausedTime + 10, audioBuffer.duration);
+        pausedTime = newTime;
+        stopPlayback();
+        startPlayback(newTime);
+    });
 
-// Skip 30 seconds forward
-skipForward30.addEventListener("click", () => {
-  if (!audioBuffer) return;
+    // Skip 30 seconds forward
+    skipForward30.addEventListener("click", () => {
+        if (!audioBuffer) return;
 
-  const newTime = Math.min(pausedTime + 30, audioBuffer.duration);
-  pausedTime = newTime;
-  stopPlayback();
-  startPlayback(newTime); // Start playback from the new time
-});
+        const newTime = Math.min(pausedTime + 30, audioBuffer.duration);
+        pausedTime = newTime;
+        stopPlayback();
+        startPlayback(newTime);
+    });
 
-// Update slider while dragging
-progressBar.addEventListener("input", (event) => {
-  const seekTime = event.target.value;
-  currentTimeDisplay.textContent = formatTime(seekTime);
-});
+    // Update slider while dragging
+    progressBar.addEventListener("input", (event) => {
+        const seekTime = event.target.value;
+        currentTimeDisplay.textContent = formatTime(seekTime);
+    });
 
-// Seek to new time when slider changes
-progressBar.addEventListener("change", (event) => {
-  const seekTime = parseFloat(event.target.value);
-  pausedTime = seekTime;
-  stopPlayback();
-  startPlayback(seekTime); // Start playback from the new time
-});
+    // Seek to new time when slider changes
+    progressBar.addEventListener("change", (event) => {
+        const seekTime = parseFloat(event.target.value);
+        pausedTime = seekTime;
+        stopPlayback();
+        startPlayback(seekTime); // Start playback from the new time
+    });
 
     // Adjust volume
     volumeSlider.addEventListener("input", (event) => {
@@ -308,7 +332,6 @@ progressBar.addEventListener("change", (event) => {
     function startPlayback(time) {
         if (sourceNode) {
             sourceNode.stop();
-            sourceNode.disconnect();
         }
 
         sourceNode = audioContext.createBufferSource();
@@ -325,6 +348,10 @@ progressBar.addEventListener("change", (event) => {
             stopButton.disabled = true;
             isPlaying = false;
             pausedTime = 0;
+
+            // Reset button colors when playback ends
+            playButton.style.backgroundColor = "#4caf50";  // Active Play button color
+            stopButton.style.backgroundColor = "#ccc";  // Disabled Stop button color
         };
 
         updateProgress();
