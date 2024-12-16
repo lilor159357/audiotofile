@@ -245,58 +245,58 @@
     });
 
     // Skip 10 seconds backward
-    skipBack10.addEventListener("click", () => {
-        if (!audioBuffer) return;
+skipBack10.addEventListener("click", () => {
+  if (!audioBuffer) return;
 
-        const newTime = Math.max(pausedTime - 10, 0);
-        pausedTime = newTime;
-        stopPlayback();
-        startPlayback(newTime);
-    });
+  const newTime = Math.max(pausedTime - 10, 0);
+  pausedTime = newTime;
+  stopPlayback();
+  startPlayback(newTime); // Start playback from the new time
+});
 
-    // Skip 30 seconds backward
-    skipBack30.addEventListener("click", () => {
-        if (!audioBuffer) return;
+// Skip 30 seconds backward
+skipBack30.addEventListener("click", () => {
+  if (!audioBuffer) return;
 
-        const newTime = Math.max(pausedTime - 30, 0);
-        pausedTime = newTime;
-        stopPlayback();
-        startPlayback(newTime);
-    });
+  const newTime = Math.max(pausedTime - 30, 0);
+  pausedTime = newTime;
+  stopPlayback();
+  startPlayback(newTime); // Start playback from the new time
+});
 
-    // Skip 10 seconds forward
-    skipForward10.addEventListener("click", () => {
-        if (!audioBuffer) return;
+// Skip 10 seconds forward
+skipForward10.addEventListener("click", () => {
+  if (!audioBuffer) return;
 
-        const newTime = Math.min(pausedTime + 10, audioBuffer.duration);
-        pausedTime = newTime;
-        stopPlayback();
-        startPlayback(newTime);
-    });
+  const newTime = Math.min(pausedTime + 10, audioBuffer.duration);
+  pausedTime = newTime;
+  stopPlayback();
+  startPlayback(newTime); // Start playback from the new time
+});
 
-    // Skip 30 seconds forward
-    skipForward30.addEventListener("click", () => {
-        if (!audioBuffer) return;
+// Skip 30 seconds forward
+skipForward30.addEventListener("click", () => {
+  if (!audioBuffer) return;
 
-        const newTime = Math.min(pausedTime + 30, audioBuffer.duration);
-        pausedTime = newTime;
-        stopPlayback();
-        startPlayback(newTime);
-    });
+  const newTime = Math.min(pausedTime + 30, audioBuffer.duration);
+  pausedTime = newTime;
+  stopPlayback();
+  startPlayback(newTime); // Start playback from the new time
+});
 
-    // Update slider while dragging
-    progressBar.addEventListener("input", (event) => {
-        const seekTime = event.target.value;
-        currentTimeDisplay.textContent = formatTime(seekTime);
-    });
+// Update slider while dragging
+progressBar.addEventListener("input", (event) => {
+  const seekTime = event.target.value;
+  currentTimeDisplay.textContent = formatTime(seekTime);
+});
 
-    // Seek to new time when slider changes
-    progressBar.addEventListener("change", (event) => {
-        const seekTime = parseFloat(event.target.value);
-        pausedTime = seekTime;
-        stopPlayback();
-        startPlayback(seekTime); // Start playback from the new time
-    });
+// Seek to new time when slider changes
+progressBar.addEventListener("change", (event) => {
+  const seekTime = parseFloat(event.target.value);
+  pausedTime = seekTime;
+  stopPlayback();
+  startPlayback(seekTime); // Start playback from the new time
+});
 
     // Adjust volume
     volumeSlider.addEventListener("input", (event) => {
