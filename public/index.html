@@ -95,6 +95,22 @@
       cursor: not-allowed;
     }
 
+    /* For the play button when it's active (not disabled) */
+    #playButton:not(:disabled) {
+      background-color: var(--primary-color);
+    }
+
+    /* For the stop button when it's active (not disabled) */
+    #stopButton:not(:disabled) {
+      background-color: var(--primary-color);
+    }
+
+    /* Adjust stop button when it's disabled */
+    #stopButton:disabled {
+      background-color: #ccc;
+      cursor: not-allowed;
+    }
+
     .file-info {
       margin: 10px 0;
       font-size: 0.9rem;
@@ -229,15 +245,15 @@
         if (!audioBuffer) return;
 
         startPlayback(pausedTime);
-        playButton.disabled = true;
-        stopButton.disabled = false;
+        playButton.disabled = true;  // Disable the play button when playing
+        stopButton.disabled = false;  // Enable the stop button
     });
 
     // Stop the audio
     stopButton.addEventListener("click", () => {
         stopPlayback();
-        playButton.disabled = false;
-        stopButton.disabled = true;
+        playButton.disabled = false;  // Enable the play button when stopped
+        stopButton.disabled = true;   // Disable the stop button
     });
 
     // Skip 10 seconds backward
@@ -318,30 +334,33 @@
         sourceNode.onended = () => {
             playButton.disabled = false;
             stopButton.disabled = true;
+            pausedTime = 0;
         };
 
-        updateProgressBar();
+        updateProgress();
     }
 
     function stopPlayback() {
         if (sourceNode) {
             sourceNode.stop();
+            sourceNode.disconnect();
         }
     }
 
-    function updateProgressBar() {
-        const currentTime = audioContext.currentTime - startTime;
-        progressBar.value = currentTime;
-        currentTimeDisplay.textContent = formatTime(currentTime);
-        if (currentTime < audioBuffer.duration) {
-            requestAnimationFrame(updateProgressBar);
+    function updateProgress() {
+        if (sourceNode && audioContext.state === "running") {
+            const elapsed = audioContext.currentTime - startTime;
+            pausedTime = elapsed;
+            progressBar.value = elapsed;
+            currentTimeDisplay.textContent = formatTime(elapsed);
+            requestAnimationFrame(updateProgress);
         }
     }
 
     function formatTime(seconds) {
-        const minutes = Math.floor(seconds / 60);
-        const sec = Math.floor(seconds % 60);
-        return `${minutes}:${sec < 10 ? "0" : ""}${sec}`;
+        const mins = Math.floor(seconds / 60);
+        const secs = Math.floor(seconds % 60);
+        return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
     }
   </script>
 </body>
