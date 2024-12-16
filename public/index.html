@@ -150,12 +150,12 @@
       border: none;
     }
 
-  </style>
+   </style>
 </head>
 <body>
   <main>
     <h1>שליחת שמע למיקרופון</h1>
-    <p>.בחר קובץ שמע ונגן אותו</p>
+    <p>בחר קובץ שמע ונגן אותו</p>
 
     <label for="audioFile">בחר קובץ שמע</label>
     <input type="file" id="audioFile" accept="audio/*" />
@@ -206,7 +206,7 @@
     const skipForward30 = document.getElementById("skipForward30");
 
     let audioContext, audioBuffer, sourceNode, gainNode;
-    let startTime = 0, pausedTime = 0;
+    let startTime = 0, pausedTime = 0, isPlaying = false;
 
     // Load and decode the audio file
     audioFileInput.addEventListener("change", async (event) => {
@@ -244,16 +244,20 @@
     playButton.addEventListener("click", () => {
         if (!audioBuffer) return;
 
-        startPlayback(pausedTime);
-        playButton.disabled = true;  // Disable the play button when playing
-        stopButton.disabled = false;  // Enable the stop button
+        if (!isPlaying) {
+            startPlayback(pausedTime);  // Start from the current paused time
+            playButton.disabled = true;
+            stopButton.disabled = false;
+            isPlaying = true;
+        }
     });
 
     // Stop the audio
     stopButton.addEventListener("click", () => {
         stopPlayback();
-        playButton.disabled = false;  // Enable the play button when stopped
-        stopButton.disabled = true;   // Disable the stop button
+        playButton.disabled = false;
+        stopButton.disabled = true;
+        isPlaying = false;
     });
 
     // Skip 10 seconds backward
@@ -307,7 +311,7 @@
         const seekTime = parseFloat(event.target.value);
         pausedTime = seekTime;
         stopPlayback();
-        startPlayback(pausedTime);
+        startPlayback(seekTime); // Start playback from the new time
     });
 
     // Adjust volume
@@ -328,12 +332,13 @@
         sourceNode.connect(gainNode);
         gainNode.connect(audioContext.destination);
 
-        sourceNode.start(0, time);
+        sourceNode.start(0, time);  // Start audio from the given time
         startTime = audioContext.currentTime - time;
 
         sourceNode.onended = () => {
             playButton.disabled = false;
             stopButton.disabled = true;
+            isPlaying = false;
             pausedTime = 0;
         };
 
