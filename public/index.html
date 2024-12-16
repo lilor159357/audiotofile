@@ -103,6 +103,22 @@
 
     .progress-container {
       margin-top: 20px;
+      width: 100%;
+    }
+
+    .progress-bar-container {
+      width: 100%;
+      height: 10px;
+      background-color: #ddd;
+      border-radius: 5px;
+      overflow: hidden;
+    }
+
+    .progress-bar {
+      height: 100%;
+      background-color: var(--primary-color);
+      width: 0%;
+      transition: width 0.2s ease;
     }
 
     .volume-control {
@@ -153,10 +169,11 @@
       <button id="skipForward30" disabled>30s →</button>
     </div>
 
-    <!-- Percentage Display -->
+    <!-- Progress Bar -->
     <div class="progress-container">
-      <span id="currentTime">00:00</span>
-      <span id="percentageComplete">0%</span>
+      <div class="progress-bar-container">
+        <div id="progressBar" class="progress-bar"></div>
+      </div>
     </div>
 
     <div class="volume-control">
@@ -178,8 +195,7 @@
     const audioPlayer = document.getElementById("audioPlayer");
     const audioSource = document.getElementById("audioSource");
     const fileInfo = document.getElementById("fileInfo");
-    const currentTimeDisplay = document.getElementById("currentTime");
-    const percentageCompleteDisplay = document.getElementById("percentageComplete");
+    const progressBar = document.getElementById("progressBar");
     const volumeSlider = document.getElementById("volumeSlider");
     const skipBack10 = document.getElementById("skipBack10");
     const skipBack30 = document.getElementById("skipBack30");
@@ -210,16 +226,15 @@
         };
     });
 
-    // Update current time and percentage of audio completed
+    // Update progress bar as audio plays
     audioPlayer.ontimeupdate = () => {
         const currentTime = audioPlayer.currentTime;
         const duration = audioPlayer.duration;
 
-        currentTimeDisplay.textContent = formatTime(currentTime);
-        
-        // Calculate and display the percentage of completion
-        const percentage = Math.floor((currentTime / duration) * 100);
-        percentageCompleteDisplay.textContent = `${percentage}%`;
+        if (duration > 0) {
+            const percentage = (currentTime / duration) * 100;
+            progressBar.style.width = `${percentage}%`;
+        }
     };
 
     // Skip 10 seconds backward
@@ -246,13 +261,6 @@
     volumeSlider.addEventListener("input", (event) => {
         audioPlayer.volume = event.target.value;
     });
-
-    // Format time (mm:ss)
-    function formatTime(seconds) {
-        const mins = Math.floor(seconds / 60);
-        const secs = Math.floor(seconds % 60);
-        return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
-    }
   </script>
 </body>
 </html>
