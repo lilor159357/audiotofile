@@ -22,6 +22,18 @@
       display: flex;
       flex-direction: column;
       align-items: center;
+      height: 100vh;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+
+    .content-container {
+      display: flex;
+      width: 100%;
+      max-width: 1200px;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      flex-grow: 1;
     }
 
     main {
@@ -31,8 +43,14 @@
       border-radius: var(--border-radius);
       text-align: center;
       width: 100%;
-      max-width: 400px;
-      margin: 20px;
+      max-width: 500px;
+      margin-right: 20px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      margin-left: auto;
+      margin-right: auto;
     }
 
     h1 {
@@ -137,9 +155,30 @@
       margin-right: 10px;
     }
 
-    section {
-      width: 100%;
-      margin: 0;
+    .right-panel {
+      width: 300px;
+	  text-align: justify;
+      background: #fff;
+      padding: var(--padding);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      border-radius: var(--border-radius);
+      flex-shrink: 0;
+      height: auto;
+    }
+
+    .right-panel h2 {
+      color: var(--primary-color);
+    }
+
+    .right-panel ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .right-panel ul li {
+      margin-bottom: 10px;
+      font-size: 1rem;
+      color: #555;
     }
 
     iframe {
@@ -148,47 +187,72 @@
       border: none;
     }
 
+    section {
+      width: 100%;
+      margin: 0;
+    }
   </style>
 </head>
 <body>
-  <main>
-    <h1>שליחת שמע למיקרופון</h1>
-    <p>בחר קובץ שמע ונגן אותו</p>
+  <!-- Main Content and Right Panel in Flex Container -->
+  <div class="content-container">
+    <!-- Main Content -->
+    <main>
+      <h1>שליחת שמע למיקרופון</h1>
+      <p>בחר קובץ שמע ונגן אותו</p>
 
-    <label for="audioFile">בחר קובץ שמע</label>
-    <input type="file" id="audioFile" accept="audio/*" />
+      <label for="audioFile">בחר קובץ שמע</label>
+      <input type="file" id="audioFile" accept="audio/*" />
 
-    <div class="file-info" id="fileInfo">לא נבחר קובץ</div>
+      <div class="file-info" id="fileInfo">לא נבחר קובץ</div>
 
-    <!-- Audio Player Container -->
-    <div>
-      <audio id="audioPlayer" controls>
-        <source id="audioSource" type="audio/mp3">
-        Your browser does not support the audio element.
-      </audio>
-    </div>
-
-    <div class="controls">
-      <button id="skipBack30" disabled>← 30s</button>
-      <button id="skipBack10" disabled>← 10s</button>
-      <button id="skipForward10" disabled>10s →</button>
-      <button id="skipForward30" disabled>30s →</button>
-    </div>
-
-    <!-- Progress Bar and Percentage -->
-    <div class="progress-container">
-      <div class="percentage" id="percentage">0%</div>
-      <div class="progress-bar-container">
-        <div id="progressBar" class="progress-bar"></div>
+      <!-- Audio Player Container -->
+      <div>
+        <audio id="audioPlayer" controls>
+          <source id="audioSource" type="audio/mp3">
+          Your browser does not support the audio element.
+        </audio>
       </div>
-    </div>
 
-    <div class="volume-control">
-      <label for="volumeSlider">Volume</label>
-      <input type="range" id="volumeSlider" min="0" max="1" step="0.01" value="1" />
-    </div>
-  </main>
+      <div class="controls">
+        <button id="skipBack30" disabled>← 30s</button>
+        <button id="skipBack10" disabled>← 10s</button>
+        <button id="skipForward10" disabled>10s →</button>
+        <button id="skipForward30" disabled>30s →</button>
+      </div>
 
+      <!-- Progress Bar and Percentage -->
+      <div class="progress-container">
+        <div class="percentage" id="percentage">0%</div>
+        <div class="progress-bar-container">
+          <div id="progressBar" class="progress-bar"></div>
+        </div>
+      </div>
+
+      <div class="volume-control">
+        <label for="volumeSlider">Volume</label>
+        <input type="range" id="volumeSlider" min="0" max="1" step="0.01" value="1" />
+      </div>
+    </main>
+
+    <!-- Right Panel for Instructions -->
+		<div class="right-panel" dir="rtl">
+	  <h2>:הוראות</h2>
+	  <ul>
+		<li>1. אם זאת פעם ראשונה שאתם משתמשים באתר על מחשב זה, וטרם התקנתם את התוכנה vbcable (כבל וירטואלי), אנא לחצו 
+		<a href="https://onedrive.live.com/download?resid=ECFCB301C295DE70!621&authkey=!AM2jrQoqftetKqI">כאן</a> 
+		על מנת להוריד ולהתקין אותה.
+		</li>
+		<li>2. לחצו
+		<a href="ms-settings:apps-volume">כאן</a>
+		כדי לפתוח את הגדרות הצלילים</li>
+		<li>Use the skip buttons to move forward or backward in the audio.</li>
+		<li>Adjust the volume using the slider.</li>
+	  </ul>
+	</div>
+  </div>
+
+  <!-- Iframe below the main content -->
   <section>
     <iframe 
       src="https://speechnotes.co/dictate/" 
@@ -220,7 +284,7 @@
             return;
         }
 
-        fileInfo.textContent = `נבחר: ${file.name}`;
+        fileInfo.textContent = נבחר: ${file.name};
 
         const url = URL.createObjectURL(file);
         audioSource.src = url;
@@ -241,8 +305,8 @@
 
         if (duration > 0) {
             const percentage = (currentTime / duration) * 100;
-            progressBar.style.width = `${percentage}%`;
-            percentageDisplay.textContent = `${Math.round(percentage)}%`;
+            progressBar.style.width = ${percentage}%;
+            percentageDisplay.textContent = ${Math.round(percentage)}%;
         }
     };
 
