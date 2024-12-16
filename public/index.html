@@ -227,27 +227,12 @@
         playButton.disabled = true;
         stopButton.disabled = false;
 
-        const progressInterval = setInterval(() => {
-            if (sourceNode && !isDragging) {
-                const currentTime = audioContext.currentTime - startTime;
-                currentTimeDisplay.textContent = formatTime(currentTime);
-                progressBar.value = Math.floor(currentTime);
-            }
-        }, 500);
-
-        sourceNode.onended = () => {
-            clearInterval(progressInterval);
-            playButton.disabled = false;
-            stopButton.disabled = true;
-            pausedTime = 0;
-            progressBar.value = 0;
-        };
+        updateProgressBar();
     });
 
     // Stop the audio
     stopButton.addEventListener("click", () => {
         stopPlayback();
-        pausedTime = audioContext.currentTime - startTime;
         playButton.disabled = false;
         stopButton.disabled = true;
     });
@@ -261,12 +246,17 @@
 
     // Seek to new time when slider changes
     progressBar.addEventListener("change", (event) => {
-        const seekTime = event.target.value;
+        const seekTime = parseFloat(event.target.value);
         pausedTime = seekTime;
+
+        // Stop the current playback and start from the new time
         if (sourceNode) {
             stopPlayback();
         }
+
         startPlayback(pausedTime);
+        playButton.disabled = true;
+        stopButton.disabled = false;
         isDragging = false;
     });
 
@@ -278,51 +268,19 @@
     });
 
     // Helper to start playback
-function startPlayback(offset) {
-    // Stop and disconnect any existing sourceNode
-    if (sourceNode) {
-        sourceNode.stop();
-        sourceNode.disconnect();
-        sourceNode = null;
-    }
+    function startPlayback(offset) {
+        // Stop and disconnect any existing sourceNode
+        if (sourceNode) {
+            sourceNode.stop();
+            sourceNode.disconnect();
+            sourceNode = null;
+        }
 
-    sourceNode = audioContext.createBufferSource();
-    sourceNode.buffer = audioBuffer;
+        sourceNode = audioContext.createBufferSource();
+        sourceNode.buffer = audioBuffer;
 
-    gainNode = audioContext.createGain();
-    gainNode.gain.value = volumeSlider.value;
+        gainNode = audioContext.createGain();
+        gainNode.gain.value = volumeSlider.value;
 
-    sourceNode.connect(gainNode).connect(audioContext.destination);
-    startTime = audioContext.currentTime - offset;
-
-    sourceNode.start(0, offset);
-
-    // Handle playback end
-    sourceNode.onended = () => {
-        playButton.disabled = false;
-        stopButton.disabled = true;
-        pausedTime = 0; // Reset paused time
-        progressBar.value = 0; // Reset progress bar
-    };
-}
-
-// Helper to stop playback
-function stopPlayback() {
-    if (sourceNode) {
-        sourceNode.stop();
-        sourceNode.disconnect();
-        sourceNode = null;
-    }
-    pausedTime = audioContext.currentTime - startTime;
-}
-
-
-    // Format time to MM:SS
-    function formatTime(seconds) {
-        const minutes = Math.floor(seconds / 60);
-        seconds = Math.floor(seconds % 60);
-        return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
-    }
-  </script>
-</body>
-</html>
+        sourceNode.connect(gainNode).connect(audioContext.destination);
+        startTime = audioContext.currentTime - offset;
