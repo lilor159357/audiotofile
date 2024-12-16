@@ -102,15 +102,7 @@
     }
 
     .progress-container {
-      display: flex;
-      align-items: center;
-      gap: 10px;
       margin-top: 20px;
-    }
-
-    input[type="range"] {
-      flex: 1;
-      cursor: pointer;
     }
 
     .volume-control {
@@ -161,10 +153,10 @@
       <button id="skipForward30" disabled>30s →</button>
     </div>
 
+    <!-- Percentage Display -->
     <div class="progress-container">
       <span id="currentTime">00:00</span>
-      <input type="range" id="progressBar" value="0" min="0" max="100" />
-      <span id="totalTime">00:00</span>
+      <span id="percentageComplete">0%</span>
     </div>
 
     <div class="volume-control">
@@ -186,9 +178,8 @@
     const audioPlayer = document.getElementById("audioPlayer");
     const audioSource = document.getElementById("audioSource");
     const fileInfo = document.getElementById("fileInfo");
-    const progressBar = document.getElementById("progressBar");
     const currentTimeDisplay = document.getElementById("currentTime");
-    const totalTimeDisplay = document.getElementById("totalTime");
+    const percentageCompleteDisplay = document.getElementById("percentageComplete");
     const volumeSlider = document.getElementById("volumeSlider");
     const skipBack10 = document.getElementById("skipBack10");
     const skipBack30 = document.getElementById("skipBack30");
@@ -212,8 +203,6 @@
         audioPlayer.load();
 
         audioPlayer.onloadedmetadata = () => {
-            totalTimeDisplay.textContent = formatTime(audioPlayer.duration);
-            progressBar.max = Math.floor(audioPlayer.duration);
             skipBack10.disabled = false;
             skipBack30.disabled = false;
             skipForward10.disabled = false;
@@ -221,11 +210,16 @@
         };
     });
 
-    // Update current time and progress bar while playing
+    // Update current time and percentage of audio completed
     audioPlayer.ontimeupdate = () => {
         const currentTime = audioPlayer.currentTime;
+        const duration = audioPlayer.duration;
+
         currentTimeDisplay.textContent = formatTime(currentTime);
-        progressBar.value = currentTime;
+        
+        // Calculate and display the percentage of completion
+        const percentage = Math.floor((currentTime / duration) * 100);
+        percentageCompleteDisplay.textContent = `${percentage}%`;
     };
 
     // Skip 10 seconds backward
