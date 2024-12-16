@@ -324,6 +324,7 @@
     function startPlayback(time) {
         if (sourceNode) {
             sourceNode.stop();
+            sourceNode.disconnect();
         }
 
         sourceNode = audioContext.createBufferSource();
