@@ -157,7 +157,7 @@
 
     .right-panel {
       width: 300px;
-	  text-align: justify;
+      text-align: justify;
       background: #fff;
       padding: var(--padding);
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
@@ -194,9 +194,7 @@
   </style>
 </head>
 <body>
-  <!-- Main Content and Right Panel in Flex Container -->
   <div class="content-container">
-    <!-- Main Content -->
     <main>
       <h1>שליחת שמע למיקרופון</h1>
       <p>בחר קובץ שמע ונגן אותו</p>
@@ -206,10 +204,8 @@
 
       <div class="file-info" id="fileInfo">לא נבחר קובץ</div>
 
-      <!-- Audio Player Container -->
       <div>
         <audio id="audioPlayer" controls>
-          <source id="audioSource" type="audio/mp3">
           Your browser does not support the audio element.
         </audio>
       </div>
@@ -221,7 +217,6 @@
         <button id="skipForward30" disabled>30s →</button>
       </div>
 
-      <!-- Progress Bar and Percentage -->
       <div class="progress-container">
         <div class="percentage" id="percentage">0%</div>
         <div class="progress-bar-container">
@@ -235,24 +230,23 @@
       </div>
     </main>
 
-    <!-- Right Panel for Instructions -->
-		<div class="right-panel" dir="rtl">
-	  <h2>:הוראות</h2>
-	  <ul>
-		<li>1. אם זאת פעם ראשונה שאתם משתמשים באתר על מחשב זה, וטרם התקנתם את התוכנה vbcable (כבל וירטואלי), אנא לחצו 
-		<a href="https://onedrive.live.com/download?resid=ECFCB301C295DE70!621&authkey=!AM2jrQoqftetKqI">כאן</a> 
-		על מנת להוריד ולהתקין אותה.
-		</li>
-		<li>2. לחצו
-		<a href="ms-settings:apps-volume">כאן</a>
-		כדי לפתוח את הגדרות הצלילים</li>
-		<li>Use the skip buttons to move forward or backward in the audio.</li>
-		<li>Adjust the volume using the slider.</li>
-	  </ul>
-	</div>
+    <div class="right-panel" dir="rtl">
+      <h2>:הוראות</h2>
+      <ul>
+        <li>1. אם זאת פעם ראשונה שאתם משתמשים באתר על מחשב זה, וטרם התקנתם את התוכנה vbcable (כבל וירטואלי), אנא לחצו 
+          <a href="https://onedrive.live.com/download?resid=ECFCB301C295DE70!621&authkey=!AM2jrQoqftetKqI">כאן</a> 
+          על מנת להוריד ולהתקין אותה.
+        </li>
+        <li>2. לחצו
+          <a href="ms-settings:apps-volume">כאן</a>
+          כדי לפתוח את הגדרות הצלילים
+        </li>
+        <li>Use the skip buttons to move forward or backward in the audio.</li>
+        <li>Adjust the volume using the slider.</li>
+      </ul>
+    </div>
   </div>
 
-  <!-- Iframe below the main content -->
   <section>
     <iframe 
       src="https://speechnotes.co/dictate/" 
@@ -264,7 +258,6 @@
   <script>
     const audioFileInput = document.getElementById("audioFile");
     const audioPlayer = document.getElementById("audioPlayer");
-    const audioSource = document.getElementById("audioSource");
     const fileInfo = document.getElementById("fileInfo");
     const progressBar = document.getElementById("progressBar");
     const percentageDisplay = document.getElementById("percentage");
@@ -274,8 +267,7 @@
     const skipForward10 = document.getElementById("skipForward10");
     const skipForward30 = document.getElementById("skipForward30");
 
-    // Load audio file
-    audioFileInput.addEventListener("change", async (event) => {
+    audioFileInput.addEventListener("change", (event) => {
         const file = event.target.files[0];
         if (!file) return;
 
@@ -284,53 +276,51 @@
             return;
         }
 
-        fileInfo.textContent = נבחר: ${file.name};
-
+        fileInfo.textContent = `נבחר: ${file.name}`;
         const url = URL.createObjectURL(file);
-        audioSource.src = url;
-        audioPlayer.load();
+        audioPlayer.src = url;
 
-        audioPlayer.onloadedmetadata = () => {
+        audioPlayer.addEventListener("loadedmetadata", () => {
             skipBack10.disabled = false;
             skipBack30.disabled = false;
             skipForward10.disabled = false;
             skipForward30.disabled = false;
-        };
+        });
+
+        audioPlayer.addEventListener("error", () => {
+            fileInfo.textContent = "Failed to load audio file.";
+        });
+
+        audioPlayer.load();
     });
 
-    // Update progress bar and percentage as audio plays
     audioPlayer.ontimeupdate = () => {
         const currentTime = audioPlayer.currentTime;
         const duration = audioPlayer.duration;
 
         if (duration > 0) {
             const percentage = (currentTime / duration) * 100;
-            progressBar.style.width = ${percentage}%;
-            percentageDisplay.textContent = ${Math.round(percentage)}%;
+            progressBar.style.width = `${percentage}%`;
+            percentageDisplay.textContent = `${Math.round(percentage)}%`;
         }
     };
 
-    // Skip 10 seconds backward
     skipBack10.addEventListener("click", () => {
         audioPlayer.currentTime = Math.max(audioPlayer.currentTime - 10, 0);
     });
 
-    // Skip 30 seconds backward
     skipBack30.addEventListener("click", () => {
         audioPlayer.currentTime = Math.max(audioPlayer.currentTime - 30, 0);
     });
 
-    // Skip 10 seconds forward
     skipForward10.addEventListener("click", () => {
         audioPlayer.currentTime = Math.min(audioPlayer.currentTime + 10, audioPlayer.duration);
     });
 
-    // Skip 30 seconds forward
     skipForward30.addEventListener("click", () => {
         audioPlayer.currentTime = Math.min(audioPlayer.currentTime + 30, audioPlayer.duration);
     });
 
-    // Adjust volume
     volumeSlider.addEventListener("input", (event) => {
         audioPlayer.volume = event.target.value;
     });
