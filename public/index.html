@@ -121,6 +121,12 @@
       transition: width 0.2s ease;
     }
 
+    .percentage {
+      font-size: 1.2rem;
+      color: var(--primary-color);
+      margin-bottom: 10px;
+    }
+
     .volume-control {
       display: flex;
       align-items: center;
@@ -169,8 +175,9 @@
       <button id="skipForward30" disabled>30s →</button>
     </div>
 
-    <!-- Progress Bar -->
+    <!-- Progress Bar and Percentage -->
     <div class="progress-container">
+      <div class="percentage" id="percentage">0%</div>
       <div class="progress-bar-container">
         <div id="progressBar" class="progress-bar"></div>
       </div>
@@ -196,6 +203,7 @@
     const audioSource = document.getElementById("audioSource");
     const fileInfo = document.getElementById("fileInfo");
     const progressBar = document.getElementById("progressBar");
+    const percentageDisplay = document.getElementById("percentage");
     const volumeSlider = document.getElementById("volumeSlider");
     const skipBack10 = document.getElementById("skipBack10");
     const skipBack30 = document.getElementById("skipBack30");
@@ -226,7 +234,7 @@
         };
     });
 
-    // Update progress bar as audio plays
+    // Update progress bar and percentage as audio plays
     audioPlayer.ontimeupdate = () => {
         const currentTime = audioPlayer.currentTime;
         const duration = audioPlayer.duration;
@@ -234,6 +242,7 @@
         if (duration > 0) {
             const percentage = (currentTime / duration) * 100;
             progressBar.style.width = `${percentage}%`;
+            percentageDisplay.textContent = `${Math.round(percentage)}%`;
         }
     };
 
