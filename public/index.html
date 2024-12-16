@@ -134,12 +134,6 @@
       border: none;
     }
 
-    @media (max-width: 600px) {
-      .controls {
-        flex-direction: column;
-        gap: 10px;
-      }
-    }
   </style>
 </head>
 <body>
@@ -188,7 +182,7 @@
     const volumeSlider = document.getElementById("volumeSlider");
 
     let audioContext, audioBuffer, sourceNode, gainNode;
-    let startTime = 0, pausedTime = 0, isDragging = false, animationFrameId;
+    let startTime = 0, pausedTime = 0;
 
     // Load and decode the audio file
     audioFileInput.addEventListener("change", async (event) => {
@@ -215,7 +209,6 @@
             playButton.disabled = false;
         } catch (error) {
             fileInfo.textContent = "Error decoding audio file.";
-            console.error(error);
         }
     });
 
@@ -226,8 +219,6 @@
         startPlayback(pausedTime);
         playButton.disabled = true;
         stopButton.disabled = false;
-
-        updateProgressBar();
     });
 
     // Stop the audio
@@ -239,7 +230,6 @@
 
     // Update slider while dragging
     progressBar.addEventListener("input", (event) => {
-        isDragging = true;
         const seekTime = event.target.value;
         currentTimeDisplay.textContent = formatTime(seekTime);
     });
@@ -248,82 +238,59 @@
     progressBar.addEventListener("change", (event) => {
         const seekTime = parseFloat(event.target.value);
         pausedTime = seekTime;
-
-        // Stop the current playback and start from the new time
-        if (sourceNode) {
-            stopPlayback();
-        }
-
+        stopPlayback();
         startPlayback(pausedTime);
-        playButton.disabled = true;
-        stopButton.disabled = false;
-        isDragging = false;
     });
 
     // Adjust volume
-    volumeSlider.addEventListener("input", () => {
+    volumeSlider.addEventListener("input", (event) => {
         if (gainNode) {
-            gainNode.gain.value = volumeSlider.value;
+            gainNode.gain.value = event.target.value;
         }
     });
 
-    // Helper to start playback
-    function startPlayback(offset) {
+    function startPlayback(time) {
         if (sourceNode) {
             sourceNode.stop();
-            sourceNode.disconnect();
-            sourceNode = null;
         }
 
         sourceNode = audioContext.createBufferSource();
-        sourceNode.buffer = audioBuffer;
-
         gainNode = audioContext.createGain();
-        gainNode.gain.value = volumeSlider.value;
+        sourceNode.buffer = audioBuffer;
+        sourceNode.connect(gainNode);
+        gainNode.connect(audioContext.destination);
 
-        sourceNode.connect(gainNode).connect(audioContext.destination);
-        startTime = audioContext.currentTime - offset;
-        sourceNode.start(0, offset);
+        sourceNode.start(0, time);
+        startTime = audioContext.currentTime - time;
 
         sourceNode.onended = () => {
             playButton.disabled = false;
             stopButton.disabled = true;
-            cancelAnimationFrame(animationFrameId);
         };
 
         updateProgressBar();
     }
 
-    // Helper to stop playback
     function stopPlayback() {
         if (sourceNode) {
             sourceNode.stop();
-            sourceNode.disconnect();
-            sourceNode = null;
         }
-        pausedTime = audioContext.currentTime - startTime;
-        cancelAnimationFrame(animationFrameId);
     }
 
-    // Update progress bar during playback
     function updateProgressBar() {
-        if (isDragging) return;
         const currentTime = audioContext.currentTime - startTime;
         progressBar.value = currentTime;
         currentTimeDisplay.textContent = formatTime(currentTime);
-
         if (currentTime < audioBuffer.duration) {
-            animationFrameId = requestAnimationFrame(updateProgressBar);
+            requestAnimationFrame(updateProgressBar);
         }
     }
 
-    // Format time in mm:ss
     function formatTime(seconds) {
         const minutes = Math.floor(seconds / 60);
-        const secs = Math.floor(seconds % 60);
-        return `${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        const sec = Math.floor(seconds % 60);
+        return `${minutes}:${sec < 10 ? "0" : ""}${sec}`;
     }
-</script>
-
+  </script>
 </body>
 </html>
