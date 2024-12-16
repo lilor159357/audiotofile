@@ -147,8 +147,12 @@
     <div class="file-info" id="fileInfo">לא נבחר קובץ</div>
 
     <div class="controls">
+      <button id="skipBack10" disabled>← 10s</button>
+      <button id="skipBack30" disabled>← 30s</button>
       <button id="playButton" disabled>נגן</button>
       <button id="stopButton" disabled>עצור</button>
+      <button id="skipForward10" disabled>10s →</button>
+      <button id="skipForward30" disabled>30s →</button>
     </div>
 
     <div class="progress-container">
@@ -180,6 +184,10 @@
     const currentTimeDisplay = document.getElementById("currentTime");
     const totalTimeDisplay = document.getElementById("totalTime");
     const volumeSlider = document.getElementById("volumeSlider");
+    const skipBack10 = document.getElementById("skipBack10");
+    const skipBack30 = document.getElementById("skipBack30");
+    const skipForward10 = document.getElementById("skipForward10");
+    const skipForward30 = document.getElementById("skipForward30");
 
     let audioContext, audioBuffer, sourceNode, gainNode;
     let startTime = 0, pausedTime = 0;
@@ -207,6 +215,10 @@
             totalTimeDisplay.textContent = formatTime(audioBuffer.duration);
             progressBar.max = Math.floor(audioBuffer.duration);
             playButton.disabled = false;
+            skipBack10.disabled = false;
+            skipBack30.disabled = false;
+            skipForward10.disabled = false;
+            skipForward30.disabled = false;
         } catch (error) {
             fileInfo.textContent = "Error decoding audio file.";
         }
@@ -226,6 +238,46 @@
         stopPlayback();
         playButton.disabled = false;
         stopButton.disabled = true;
+    });
+
+    // Skip 10 seconds backward
+    skipBack10.addEventListener("click", () => {
+        if (!audioBuffer) return;
+
+        const newTime = Math.max(pausedTime - 10, 0);
+        pausedTime = newTime;
+        stopPlayback();
+        startPlayback(newTime);
+    });
+
+    // Skip 30 seconds backward
+    skipBack30.addEventListener("click", () => {
+        if (!audioBuffer) return;
+
+        const newTime = Math.max(pausedTime - 30, 0);
+        pausedTime = newTime;
+        stopPlayback();
+        startPlayback(newTime);
+    });
+
+    // Skip 10 seconds forward
+    skipForward10.addEventListener("click", () => {
+        if (!audioBuffer) return;
+
+        const newTime = Math.min(pausedTime + 10, audioBuffer.duration);
+        pausedTime = newTime;
+        stopPlayback();
+        startPlayback(newTime);
+    });
+
+    // Skip 30 seconds forward
+    skipForward30.addEventListener("click", () => {
+        if (!audioBuffer) return;
+
+        const newTime = Math.min(pausedTime + 30, audioBuffer.duration);
+        pausedTime = newTime;
+        stopPlayback();
+        startPlayback(newTime);
     });
 
     // Update slider while dragging
