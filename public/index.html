@@ -95,22 +95,6 @@
       cursor: not-allowed;
     }
 
-    /* For the play button when it's active (not disabled) */
-    #playButton:not(:disabled) {
-      background-color: var(--primary-color);
-    }
-
-    /* For the stop button when it's active (not disabled) */
-    #stopButton:not(:disabled) {
-      background-color: var(--primary-color);
-    }
-
-    /* Adjust stop button when it's disabled */
-    #stopButton:disabled {
-      background-color: #ccc;
-      cursor: not-allowed;
-    }
-
     .file-info {
       margin: 10px 0;
       font-size: 0.9rem;
@@ -162,11 +146,17 @@
 
     <div class="file-info" id="fileInfo">לא נבחר קובץ</div>
 
+    <!-- Audio Player Container -->
+    <div>
+      <audio id="audioPlayer" controls>
+        <source id="audioSource" type="audio/mp3">
+        Your browser does not support the audio element.
+      </audio>
+    </div>
+
     <div class="controls">
       <button id="skipBack10" disabled>← 10s</button>
       <button id="skipBack30" disabled>← 30s</button>
-      <button id="playButton" disabled>נגן</button>
-      <button id="stopButton" disabled>עצור</button>
       <button id="skipForward10" disabled>10s →</button>
       <button id="skipForward30" disabled>30s →</button>
     </div>
@@ -193,8 +183,8 @@
 
   <script>
     const audioFileInput = document.getElementById("audioFile");
-    const playButton = document.getElementById("playButton");
-    const stopButton = document.getElementById("stopButton");
+    const audioPlayer = document.getElementById("audioPlayer");
+    const audioSource = document.getElementById("audioSource");
     const fileInfo = document.getElementById("fileInfo");
     const progressBar = document.getElementById("progressBar");
     const currentTimeDisplay = document.getElementById("currentTime");
@@ -205,10 +195,7 @@
     const skipForward10 = document.getElementById("skipForward10");
     const skipForward30 = document.getElementById("skipForward30");
 
-    let audioContext, audioBuffer, sourceNode, gainNode;
-    let startTime = 0, pausedTime = 0, isPlaying = false;
-
-    // Load and decode the audio file
+    // Load audio file
     audioFileInput.addEventListener("change", async (event) => {
         const file = event.target.files[0];
         if (!file) return;
@@ -220,160 +207,53 @@
 
         fileInfo.textContent = `נבחר: ${file.name}`;
 
-        if (!audioContext) {
-            audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        }
+        const url = URL.createObjectURL(file);
+        audioSource.src = url;
+        audioPlayer.load();
 
-        try {
-            const arrayBuffer = await file.arrayBuffer();
-            audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
-
-            totalTimeDisplay.textContent = formatTime(audioBuffer.duration);
-            progressBar.max = Math.floor(audioBuffer.duration);
-            playButton.disabled = false;
+        audioPlayer.onloadedmetadata = () => {
+            totalTimeDisplay.textContent = formatTime(audioPlayer.duration);
+            progressBar.max = Math.floor(audioPlayer.duration);
             skipBack10.disabled = false;
             skipBack30.disabled = false;
             skipForward10.disabled = false;
             skipForward30.disabled = false;
-        } catch (error) {
-            fileInfo.textContent = "Error decoding audio file.";
-        }
+        };
     });
 
-    // Play the audio
-    playButton.addEventListener("click", () => {
-        if (!audioBuffer) return;
-
-        if (!isPlaying) {
-            startPlayback(pausedTime);  // Start from the current paused time
-            playButton.disabled = true;
-            stopButton.disabled = false;
-            isPlaying = true;
-
-            // Change button colors
-            playButton.style.backgroundColor = "#ccc";  // Disabled Play button color
-            stopButton.style.backgroundColor = "#4caf50";  // Active Stop button color
-        }
-    });
-
-    // Stop the audio
-    stopButton.addEventListener("click", () => {
-        stopPlayback();
-        playButton.disabled = false;
-        stopButton.disabled = true;
-        isPlaying = false;
-
-        // Change button colors
-        playButton.style.backgroundColor = "#4caf50";  // Active Play button color
-        stopButton.style.backgroundColor = "#ccc";  // Disabled Stop button color
-    });
+    // Update current time and progress bar while playing
+    audioPlayer.ontimeupdate = () => {
+        const currentTime = audioPlayer.currentTime;
+        currentTimeDisplay.textContent = formatTime(currentTime);
+        progressBar.value = currentTime;
+    };
 
     // Skip 10 seconds backward
     skipBack10.addEventListener("click", () => {
-        if (!audioBuffer) return;
-
-        const newTime = Math.max(pausedTime - 10, 0);
-        pausedTime = newTime;
-        stopPlayback();
-        startPlayback(newTime);
+        audioPlayer.currentTime = Math.max(audioPlayer.currentTime - 10, 0);
     });
 
     // Skip 30 seconds backward
     skipBack30.addEventListener("click", () => {
-        if (!audioBuffer) return;
-
-        const newTime = Math.max(pausedTime - 30, 0);
-        pausedTime = newTime;
-        stopPlayback();
-        startPlayback(newTime);
+        audioPlayer.currentTime = Math.max(audioPlayer.currentTime - 30, 0);
     });
 
     // Skip 10 seconds forward
     skipForward10.addEventListener("click", () => {
-        if (!audioBuffer) return;
-
-        const newTime = Math.min(pausedTime + 10, audioBuffer.duration);
-        pausedTime = newTime;
-        stopPlayback();
-        startPlayback(newTime);
+        audioPlayer.currentTime = Math.min(audioPlayer.currentTime + 10, audioPlayer.duration);
     });
 
     // Skip 30 seconds forward
     skipForward30.addEventListener("click", () => {
-        if (!audioBuffer) return;
-
-        const newTime = Math.min(pausedTime + 30, audioBuffer.duration);
-        pausedTime = newTime;
-        stopPlayback();
-        startPlayback(newTime);
-    });
-
-    // Update slider while dragging
-    progressBar.addEventListener("input", (event) => {
-        const seekTime = event.target.value;
-        currentTimeDisplay.textContent = formatTime(seekTime);
-    });
-
-    // Seek to new time when slider changes
-    progressBar.addEventListener("change", (event) => {
-        const seekTime = parseFloat(event.target.value);
-        pausedTime = seekTime;
-        stopPlayback();
-        startPlayback(seekTime); // Start playback from the new time
+        audioPlayer.currentTime = Math.min(audioPlayer.currentTime + 30, audioPlayer.duration);
     });
 
     // Adjust volume
     volumeSlider.addEventListener("input", (event) => {
-        if (gainNode) {
-            gainNode.gain.value = event.target.value;
-        }
+        audioPlayer.volume = event.target.value;
     });
 
-    function startPlayback(time) {
-        if (sourceNode) {
-            sourceNode.stop();
-        }
-
-        sourceNode = audioContext.createBufferSource();
-        gainNode = audioContext.createGain();
-        sourceNode.buffer = audioBuffer;
-        sourceNode.connect(gainNode);
-        gainNode.connect(audioContext.destination);
-
-        sourceNode.start(0, time);  // Start audio from the given time
-        startTime = audioContext.currentTime - time;
-
-        sourceNode.onended = () => {
-            playButton.disabled = false;
-            stopButton.disabled = true;
-            isPlaying = false;
-            pausedTime = 0;
-
-            // Reset button colors when playback ends
-            playButton.style.backgroundColor = "#4caf50";  // Active Play button color
-            stopButton.style.backgroundColor = "#ccc";  // Disabled Stop button color
-        };
-
-        updateProgress();
-    }
-
-    function stopPlayback() {
-        if (sourceNode) {
-            sourceNode.stop();
-            sourceNode.disconnect();
-        }
-    }
-
-    function updateProgress() {
-        if (sourceNode && audioContext.state === "running") {
-            const elapsed = audioContext.currentTime - startTime;
-            pausedTime = elapsed;
-            progressBar.value = elapsed;
-            currentTimeDisplay.textContent = formatTime(elapsed);
-            requestAnimationFrame(updateProgress);
-        }
-    }
-
+    // Format time (mm:ss)
     function formatTime(seconds) {
         const mins = Math.floor(seconds / 60);
         const secs = Math.floor(seconds % 60);
