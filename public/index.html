@@ -188,7 +188,7 @@
     const volumeSlider = document.getElementById("volumeSlider");
 
     let audioContext, audioBuffer, sourceNode, gainNode;
-    let startTime = 0, pausedTime = 0, isDragging = false;
+    let startTime = 0, pausedTime = 0, isDragging = false, animationFrameId;
 
     // Load and decode the audio file
     audioFileInput.addEventListener("change", async (event) => {
@@ -269,7 +269,6 @@
 
     // Helper to start playback
     function startPlayback(offset) {
-        // Stop and disconnect any existing sourceNode
         if (sourceNode) {
             sourceNode.stop();
             sourceNode.disconnect();
@@ -289,10 +288,10 @@
         sourceNode.onended = () => {
             playButton.disabled = false;
             stopButton.disabled = true;
-            pausedTime = 0; // Reset paused time when playback ends
-            progressBar.value = 0;
-            currentTimeDisplay.textContent = formatTime(0);
+            cancelAnimationFrame(animationFrameId);
         };
+
+        updateProgressBar();
     }
 
     // Helper to stop playback
@@ -303,31 +302,26 @@
             sourceNode = null;
         }
         pausedTime = audioContext.currentTime - startTime;
+        cancelAnimationFrame(animationFrameId);
     }
 
     // Update progress bar during playback
     function updateProgressBar() {
-        if (sourceNode && !isDragging) {
-            const elapsedTime = audioContext.currentTime - startTime;
-            progressBar.value = Math.floor(elapsedTime);
-            currentTimeDisplay.textContent = formatTime(elapsedTime);
+        if (isDragging) return;
+        const currentTime = audioContext.currentTime - startTime;
+        progressBar.value = currentTime;
+        currentTimeDisplay.textContent = formatTime(currentTime);
 
-            if (elapsedTime < audioBuffer.duration) {
-                requestAnimationFrame(updateProgressBar);
-            } else {
-                progressBar.value = 0;
-                currentTimeDisplay.textContent = formatTime(0);
-                playButton.disabled = false;
-                stopButton.disabled = true;
-            }
+        if (currentTime < audioBuffer.duration) {
+            animationFrameId = requestAnimationFrame(updateProgressBar);
         }
     }
 
-    // Helper to format time
+    // Format time in mm:ss
     function formatTime(seconds) {
-        const mins = Math.floor(seconds / 60);
+        const minutes = Math.floor(seconds / 60);
         const secs = Math.floor(seconds % 60);
-        return `${String(mins).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
+        return `${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
     }
   </script>
 </body>
