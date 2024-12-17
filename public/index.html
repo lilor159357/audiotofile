@@ -156,7 +156,7 @@
     }
 
     .right-panel {
-      width: 300px;
+      width: 400px;
       text-align: justify;
       background: #fff;
       padding: var(--padding);
@@ -231,18 +231,23 @@
     </main>
 
     <div class="right-panel" dir="rtl">
-      <h2>:הוראות</h2>
+      <h2>איך להשתמש:</h2>
       <ul>
-        <li>1. אם זאת פעם ראשונה שאתם משתמשים באתר על מחשב זה, וטרם התקנתם את התוכנה vbcable (כבל וירטואלי), אנא לחצו 
+        <li>0. אם זאת פעם ראשונה שאתם משתמשים באתר על מחשב זה, וטרם התקנתם את התוכנה vbcable (כבל וירטואלי), אנא לחצו 
           <a href="https://onedrive.live.com/download?resid=ECFCB301C295DE70!621&authkey=!AM2jrQoqftetKqI">כאן</a> 
           על מנת להוריד ולהתקין אותה.
         </li>
-        <li>2. לחצו
-          <a href="ms-settings:apps-volume">כאן</a>
-          כדי לפתוח את הגדרות הצלילים
+        <li>1. אחרי שהתקנתם, או במידה והתוכנה מותקנת כבר, לחצו
+          <a id="volumeSettingsLink" href="#">כאן</a>
+          כדי לפתוח את הגדרות הצלילים.
         </li>
-        <li>Use the skip buttons to move forward or backward in the audio.</li>
-        <li>Adjust the volume using the slider.</li>
+		 <li>2. שימו לב שכל השמע שיושמע בדפדפן בו אתם משתמשים לתמלול יועבר למתמלל, לכן אם ברצונכם להשתמש בדפדפן לצורך שמע במהלך התמלול, כדאי להשתמש בדפדפן אחר. (שימוש בדפדפן אחר שאינכם משתמשים בו בדרך כלל, מועיל גם לכך שאין צורך לשנות כל פעם את הגדרות הצלילים).</li>
+        <li>3. בהגדרות הצלילים, בתפריטי הקלט והפלט שליד הדפדפן שבו אתם משתמשים בחרו ב VB-Audio Virtual Cable (סה"כ שני תפריטים, אחד לקלט ואחד לפלט).</li>
+		<li>4. בחרו קובץ שמע אותו ברצונכם לתמלל.</li>
+		<li>5. לחצו על המיקרופון כדי להתחיל את התמלול.</li>
+		<li>6. הפעילו את קובץ השמע.</li>
+		<li>7. כעת התמלול אמור להתחיל.</li>
+		<li>8. בסוף התמלול, אם אתם משתמשים בדפדפן הרגיל שלכם, צריך לשנות חזרה את הגדרות הצלילים.</li>
       </ul>
     </div>
   </div>
@@ -251,7 +256,8 @@
     <iframe 
       src="https://speechnotes.co/dictate/" 
       title="Speechnotes"
-      allow="microphone; fullscreen">
+      allow="microphone; fullscreen"
+	  tabindex="-1">
     </iframe>
   </section>
 
@@ -266,7 +272,9 @@
     const skipBack30 = document.getElementById("skipBack30");
     const skipForward10 = document.getElementById("skipForward10");
     const skipForward30 = document.getElementById("skipForward30");
+    const volumeSettingsLink = document.getElementById("volumeSettingsLink");
 
+    // Handle audio file selection
     audioFileInput.addEventListener("change", (event) => {
         const file = event.target.files[0];
         if (!file) return;
@@ -294,6 +302,7 @@
         audioPlayer.load();
     });
 
+    // Update progress bar
     audioPlayer.ontimeupdate = () => {
         const currentTime = audioPlayer.currentTime;
         const duration = audioPlayer.duration;
@@ -305,6 +314,7 @@
         }
     };
 
+    // Skip functionality
     skipBack10.addEventListener("click", () => {
         audioPlayer.currentTime = Math.max(audioPlayer.currentTime - 10, 0);
     });
@@ -321,8 +331,23 @@
         audioPlayer.currentTime = Math.min(audioPlayer.currentTime + 30, audioPlayer.duration);
     });
 
+    // Adjust volume
     volumeSlider.addEventListener("input", (event) => {
         audioPlayer.volume = event.target.value;
+    });
+
+    // Silent MP3 playback to trigger volume settings
+    volumeSettingsLink.addEventListener("click", (event) => {
+        event.preventDefault(); // Prevent the default link action
+
+        // Create a silent MP3 source
+        const silentMP3 = new Audio("silent.mp3"); // Provide a valid silent MP3 file path
+        silentMP3.play().then(() => {
+            // Open Windows sound settings
+            window.location.href = "ms-settings:apps-volume";
+        }).catch((error) => {
+            console.error("Error playing silent MP3:", error);
+        });
     });
   </script>
 </body>
