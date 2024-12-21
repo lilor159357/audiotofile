@@ -90,6 +90,36 @@
       justify-content: space-between;
       margin-top: 20px;
     }
+	.text-appender-section {
+  margin-top: 20px; /* Adds space between the iframe and the tool */
+  text-align: right;
+}
+
+.text-appender-section textarea,
+.text-appender-section button {
+  direction: rtl; /* Ensures proper RTL behavior */
+  text-align: right; /* Aligns text inside elements to the right */
+}
+
+.text-appender-section label {
+  display: block;
+  text-align: right; /* Aligns the label to the right */
+  margin-bottom: 5px;
+}
+
+.button-container {
+  display: flex;
+  justify-content: flex-start; /* Align buttons to the right in RTL */
+  gap: 10px; /* Adds space between the buttons */
+  margin-top: 10px;
+}
+
+button {
+  flex: none; /* Ensures buttons keep their intrinsic size */
+  padding: 10px 20px;
+}
+
+
 
     button {
       flex: 1;
@@ -181,6 +211,25 @@
       width: 100%;
       margin: 0;
     }
+	.text-appender-section {
+  margin-top: 20px; /* Adjust this value to add more or less space */
+}
+
+
+    textarea {
+      width: 100%;
+      max-width: 100%;
+      margin: 10px 0;
+      padding: 10px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
+
+    .hidden {
+      display: none;
+    }
   </style>
 </head>
 <body>
@@ -218,7 +267,7 @@
     <div class="right-panel" dir="rtl">
       <h2>איך להשתמש:</h2>
       <ul>
-        <li>0. אם זאת פעם ראשונה שאתם משתמשים באתר על מחשב זה, וטרם התקנתם את התוכנה vbcable (כבל וירטואלי), אנא לחצו 
+       <li>0. אם זאת פעם ראשונה שאתם משתמשים באתר על מחשב זה, וטרם התקנתם את התוכנה vbcable (כבל וירטואלי), אנא לחצו 
           <a href="https://onedrive.live.com/download?resid=ECFCB301C295DE70!621&authkey=!AM2jrQoqftetKqI">כאן</a> 
           על מנת להוריד ולהתקין אותה.
         </li>
@@ -234,8 +283,8 @@
 		<li>7. כעת התמלול אמור להתחיל.</li>
 		<li>8. בסוף התמלול, אם אתם משתמשים בדפדפן הרגיל שלכם, צריך לשנות חזרה את הגדרות הצלילים.</li>
 	        <li>9. את הטקסט אפשר לפסק באמצעות GPT ייעודי (שכל מטרתו היא לפסק תכנים)
-		<a href="https://chatgpt.com/g/g-4qZw7pIjR-dot-gpt">כאן</a>
-		. (יתכן שהוא יעצור באמצע התמלול, תלוי באורך הטקסט, פשוט צריך לומר לו "המשך מבלי לשנות את התוכן", אחרת הוא מתחיל להיות יצירתי...).
+		<a href="https://chatgpt.com/g/g-4qZw7pIjR-dot-gpt">כאן</a>.
+		(יתכן שהוא יעצור באמצע התמלול, תלוי באורך הטקסט, פשוט צריך לומר לו "המשך מבלי לשנות את התוכן", אחרת הוא מתחיל להיות יצירתי...). יש בסוף העמוד כלי להכנת הטקטסט לשליחה ל-GPT.
 		</li>
       </ul>
     </div>
@@ -246,11 +295,30 @@
       src="https://speechnotes.co/dictate/" 
       title="Speechnotes"
       allow="microphone; fullscreen"
-	  tabindex="-1">
+      tabindex="-1">
     </iframe>
   </section>
 
+  <!-- Text Appender Tool Section -->
+<section class="text-appender-section" dir="rtl">
+  <div class="content-container">
+    <main>
+      <h1>הכנה לשליחה ל-GPT</h1>
+      
+      <textarea id="text1" rows="4" placeholder="הדבק כאן את הטקסט..."></textarea>
+
+      <div class="button-container">
+        <button id="appendButton">הכן טקסט</button>
+        <button id="copyButton" class="hidden">לחץ כאן להעתקה</button>
+      </div>
+    </main>
+  </div>
+</section>
+
+	
+
   <script>
+    // Audio Player Logic
     const audioFileInput = document.getElementById("audioFile");
     const audioPlayer = document.getElementById("audioPlayer");
     const fileInfo = document.getElementById("fileInfo");
@@ -260,9 +328,7 @@
     const skipBack30 = document.getElementById("skipBack30");
     const skipForward10 = document.getElementById("skipForward10");
     const skipForward30 = document.getElementById("skipForward30");
-    const volumeSettingsLink = document.getElementById("volumeSettingsLink");
 
-    // Handle audio file selection
     audioFileInput.addEventListener("change", (event) => {
         const file = event.target.files[0];
         if (!file) return;
@@ -290,7 +356,6 @@
         audioPlayer.load();
     });
 
-    // Update progress bar
     audioPlayer.ontimeupdate = () => {
         const currentTime = audioPlayer.currentTime;
         const duration = audioPlayer.duration;
@@ -302,7 +367,6 @@
         }
     };
 
-    // Skip functionality
     skipBack10.addEventListener("click", () => {
         audioPlayer.currentTime = Math.max(audioPlayer.currentTime - 10, 0);
     });
@@ -319,7 +383,34 @@
         audioPlayer.currentTime = Math.min(audioPlayer.currentTime + 30, audioPlayer.duration);
     });
 
-    // Silent MP3 playback to trigger volume settings
+    // Text Appender Logic
+    const appendButton = document.getElementById('appendButton');
+    const copyButton = document.getElementById('copyButton');
+    const text1 = document.getElementById('text1');
+
+    const fixedText = "הוסף לכל הטקסט סימני פיסוק, כולל חלוקה לפסקאות, בלי לשנות את התוכן:";
+
+    appendButton.addEventListener('click', () => {
+        const userInput = text1.value.trim();
+        if (userInput) {
+            const preparedText = `${fixedText}\n${userInput}`;
+            
+            copyButton.classList.remove('hidden');
+
+            copyButton.addEventListener('click', async () => {
+                try {
+                    await navigator.clipboard.writeText(preparedText);
+                    alert('הטקסט הועתק ללוח!');
+                } catch (err) {
+                    console.error('שגיאה בעת העתקת הטקסט:', err);
+                    alert('לא הצלחנו להעתיק את הטקסט. נסה שוב.');
+                }
+            }, { once: true });
+        } else {
+            alert('אנא הדבק טקסט לפני הלחיצה.');
+        }
+    });
+	// Silent MP3 playback to trigger volume settings
     volumeSettingsLink.addEventListener("click", (event) => {
         event.preventDefault(); // Prevent the default link action
 
