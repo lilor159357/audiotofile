@@ -1,0 +1,16 @@
+{
+  "routes": [
+    {
+      "src": "/cc.png",
+      "dest": "/public/cc.png"
+    },
+    {
+      "src": "/favicon.png",
+      "dest": "/public/favicon.png"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/public/index.html"
+    }
+  ]
+}
