@@ -163,6 +163,12 @@ button {
       border-radius: 5px;
       overflow: hidden;
     }
+	#currentSpeed {
+  font-size: 1rem;
+  margin-top: 10px;
+  color: var(--primary-color);
+}
+
 
     .progress-bar {
       height: 100%;
@@ -263,12 +269,16 @@ button {
         </audio>
       </div>
 
-      <div class="controls">
-        <button id="skipBack30" disabled>← 30s</button>
-        <button id="skipBack10" disabled>← 10s</button>
-        <button id="skipForward10" disabled>10s →</button>
-        <button id="skipForward30" disabled>30s →</button>
-      </div>
+     <div class="controls">
+  <button id="skipBack30" disabled>← 30s</button>
+  <button id="skipBack10" disabled>← 10s</button>
+  <button id="speedDown" disabled>Speed -</button>
+  <button id="speedUp" disabled>Speed +</button>
+  <button id="skipForward10" disabled>10s →</button>
+  <button id="skipForward30" disabled>30s →</button>
+</div>
+<div id="currentSpeed">Speed: 1x</div>
+
 
       <div class="progress-container">
         <div class="percentage" id="percentage">0%</div>
@@ -350,6 +360,46 @@ button {
     const skipBack30 = document.getElementById("skipBack30");
     const skipForward10 = document.getElementById("skipForward10");
     const skipForward30 = document.getElementById("skipForward30");
+	const speedUp = document.getElementById("speedUp");
+const speedDown = document.getElementById("speedDown");
+const currentSpeed = document.getElementById("currentSpeed");
+const speedUp = document.getElementById("speedUp");
+const speedDown = document.getElementById("speedDown");
+const currentSpeed = document.getElementById("currentSpeed");
+
+// Enable speed control buttons when the audio loads
+audioPlayer.addEventListener("loadedmetadata", () => {
+    skipBack10.disabled = false;
+    skipBack30.disabled = false;
+    skipForward10.disabled = false;
+    skipForward30.disabled = false;
+    speedUp.disabled = false;
+    speedDown.disabled = false;
+});
+
+// Function to update the speed display
+function updateSpeedDisplay() {
+    currentSpeed.textContent = `Speed: ${audioPlayer.playbackRate.toFixed(1)}x`;
+}
+
+// Speed up the audio
+speedUp.addEventListener("click", () => {
+    if (audioPlayer.playbackRate < 3) { // Limit to 3x speed
+        audioPlayer.playbackRate += 0.1;
+        updateSpeedDisplay();
+    }
+});
+
+// Slow down the audio
+speedDown.addEventListener("click", () => {
+    if (audioPlayer.playbackRate > 0.5) { // Limit to 0.5x speed
+        audioPlayer.playbackRate -= 0.1;
+        updateSpeedDisplay();
+    }
+});
+
+// Initialize speed display
+updateSpeedDisplay();
 
     audioFileInput.addEventListener("change", (event) => {
         const file = event.target.files[0];
