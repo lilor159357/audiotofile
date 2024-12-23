@@ -272,8 +272,8 @@ button {
      <div class="controls">
   <button id="skipBack30" disabled>← 30s</button>
   <button id="skipBack10" disabled>← 10s</button>
-  <button id="speedDown" disabled>Speed -</button>
-  <button id="speedUp" disabled>Speed +</button>
+  <button id="speedDown" disabled>מהירות -</button>
+  <button id="speedUp" disabled>מהירות +</button>
   <button id="skipForward10" disabled>10s →</button>
   <button id="skipForward30" disabled>30s →</button>
 </div>
@@ -363,9 +363,7 @@ button {
 	const speedUp = document.getElementById("speedUp");
 const speedDown = document.getElementById("speedDown");
 const currentSpeed = document.getElementById("currentSpeed");
-const speedUp = document.getElementById("speedUp");
-const speedDown = document.getElementById("speedDown");
-const currentSpeed = document.getElementById("currentSpeed");
+
 
 // Enable speed control buttons when the audio loads
 audioPlayer.addEventListener("loadedmetadata", () => {
@@ -379,7 +377,7 @@ audioPlayer.addEventListener("loadedmetadata", () => {
 
 // Function to update the speed display
 function updateSpeedDisplay() {
-    currentSpeed.textContent = `Speed: ${audioPlayer.playbackRate.toFixed(1)}x`;
+    currentSpeed.textContent = `${audioPlayer.playbackRate.toFixed(1)}x :מהירות`;
 }
 
 // Speed up the audio
