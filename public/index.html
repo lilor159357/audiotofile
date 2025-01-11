@@ -335,7 +335,7 @@
         <div class="button-container">
           <button id="appendButton">הכן טקסט</button>
           <button id="copyButton" class="hidden">לחץ כאן להעתקה</button>
-          <button id="copyAndOpenDeepSeekButton">העתק ופתח DeepSeek</button>
+          <button id="copyAndOpenDeepSeekButton" class="hidden">העתק ופתח DeepSeek</button>
         </div>
       </main>
     </div>
@@ -498,11 +498,10 @@
               // Copy the prepared text to the clipboard
               await navigator.clipboard.writeText(preparedText);
 
-              // Send a message to the extension to open the popup
-              chrome.runtime.sendMessage({ action: "openPopup" }, (response) => {
-                console.log(response.status);
-                alert('DeepSeek popup opened.');
-              });
+              // Open the DeepSeek site in a new tab
+              window.open("https://chat.deepseek.com", "_blank");
+
+              alert('הטקסט הועתק והחלון של DeepSeek נפתח. אנא וודא שהתוכן הודבק ונשלח.');
             } catch (err) {
               console.error('Error copying or opening DeepSeek:', err);
               alert('שגיאה בעת העתקת הטקסט או פתיחת DeepSeek. נסה שוב.');
