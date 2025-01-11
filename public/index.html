@@ -335,14 +335,14 @@ button {
 <section class="text-appender-section" dir="rtl">
   <div class="content-container">
     <main>
-      <h1>הכנה לשליחה ל-GPT</h1>
+      <h1>הכנה לשליחה ל-DeepSeek</h1>
       
       <textarea id="text1" rows="4" placeholder="הדבק כאן את הטקסט..."></textarea>
 
       <div class="button-container">
         <button id="appendButton">הכן טקסט</button>
         <button id="copyButton" class="hidden">לחץ כאן להעתקה</button>
-        <button id="sendToDeepSeek">שלח ל-DeepSeek</button> <!-- New Button -->
+        <button id="copyAndOpenDeepSeekButton" class="hidden">העתק ופתח DeepSeek</button>
       </div>
     </main>
   </div>
@@ -354,15 +354,6 @@ button {
 	
 
   <script>
-  document.getElementById('sendToDeepSeek').addEventListener('click', () => {
-  const textToSend = document.getElementById('text1').value.trim();
-  if (textToSend) {
-    // Send a message to the content script
-    window.postMessage({ action: 'sendToDeepSeek', text: textToSend }, '*');
-  } else {
-    alert('אנא הדבק טקסט לפני הלחיצה.');
-  }
-});
   document.getElementById("copyChromeExtensionsLink").addEventListener("click", (event) => {
       event.preventDefault(); // Prevent the default link behavior
       const chromeURL = "chrome://extensions/";
@@ -477,32 +468,55 @@ updateSpeedDisplay();
     });
 
     // Text Appender Logic
-    const appendButton = document.getElementById('appendButton');
-    const copyButton = document.getElementById('copyButton');
-    const text1 = document.getElementById('text1');
+const appendButton = document.getElementById('appendButton');
+const copyButton = document.getElementById('copyButton');
+const copyAndOpenDeepSeekButton = document.getElementById('copyAndOpenDeepSeekButton');
+const text1 = document.getElementById('text1');
 
-    const fixedText = "הוסף לכל הטקסט סימני פיסוק, כולל חלוקה לפסקאות, בלי לשנות את התוכן:";
+const fixedText = "הוסף לכל הטקסט סימני פיסוק, כולל חלוקה לפסקאות, בלי לשנות את התוכן:";
 
-    appendButton.addEventListener('click', () => {
-        const userInput = text1.value.trim();
-        if (userInput) {
-            const preparedText = `${fixedText}\n${userInput}`;
-            
-            copyButton.classList.remove('hidden');
+appendButton.addEventListener('click', () => {
+    const userInput = text1.value.trim();
+    if (userInput) {
+        const preparedText = `${fixedText}\n${userInput}`;
+        
+        // Show both copy buttons
+        copyButton.classList.remove('hidden');
+        copyAndOpenDeepSeekButton.classList.remove('hidden');
 
-            copyButton.addEventListener('click', async () => {
-                try {
-                    await navigator.clipboard.writeText(preparedText);
-                    alert('הטקסט הועתק ללוח!');
-                } catch (err) {
-                    console.error('שגיאה בעת העתקת הטקסט:', err);
-                    alert('לא הצלחנו להעתיק את הטקסט. נסה שוב.');
-                }
-            }, { once: true });
-        } else {
-            alert('אנא הדבק טקסט לפני הלחיצה.');
-        }
-    });
+        // Copy to clipboard
+        copyButton.addEventListener('click', async () => {
+            try {
+                await navigator.clipboard.writeText(preparedText);
+                alert('הטקסט הועתק ללוח!');
+            } catch (err) {
+                console.error('שגיאה בעת העתקת הטקסט:', err);
+                alert('לא הצלחנו להעתיק את הטקסט. נסה שוב.');
+            }
+        }, { once: true });
+
+        // Copy and open DeepSeek
+        copyAndOpenDeepSeekButton.addEventListener('click', async () => {
+            try {
+                // Copy the text to clipboard
+                await navigator.clipboard.writeText(preparedText);
+
+                // Open DeepSeek chat window
+                const deepSeekURL = "https://www.deepseek.com/chat"; // Replace with the actual DeepSeek chat URL
+                window.open(deepSeekURL, '_blank');
+
+                // Simulate pasting into DeepSeek's input field (if possible)
+                // Note: This part depends on DeepSeek's web interface and may require additional automation tools.
+                alert('הטקסט הועתק ללוח. אנא הדביקו אותו בחלון DeepSeek שנפתח.');
+            } catch (err) {
+                console.error('שגיאה בעת העתקת הטקסט או פתיחת DeepSeek:', err);
+                alert('לא הצלחנו להעתיק את הטקסט או לפתוח את DeepSeek. נסה שוב.');
+            }
+        }, { once: true });
+    } else {
+        alert('אנא הדבק טקסט לפני הלחיצה.');
+    }
+});
 	// Silent MP3 playback to trigger volume settings
     volumeSettingsLink.addEventListener("click", (event) => {
         event.preventDefault(); // Prevent the default link action
@@ -516,16 +530,6 @@ updateSpeedDisplay();
             console.error("Error playing silent MP3:", error);
         });
     });
-	  // Listen for responses from the content script
-window.addEventListener('message', (event) => {
-  if (event.data.action === 'sendToDeepSeekResponse') {
-    if (event.data.success) {
-      alert('הטקסט נשלח ל-DeepSeek בהצלחה!');
-    } else {
-      alert('שגיאה בשליחת הטקסט ל-DeepSeek.');
-    }
-  }
-});
   </script>
 </body>
 </html>
