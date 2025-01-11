@@ -467,7 +467,7 @@ updateSpeedDisplay();
         audioPlayer.currentTime = Math.min(audioPlayer.currentTime + 30, audioPlayer.duration);
     });
 
-  // Text Appender Logic
+   // Text Appender Logic
 const appendButton = document.getElementById('appendButton');
 const copyButton = document.getElementById('copyButton');
 const copyAndOpenDeepSeekButton = document.getElementById('copyAndOpenDeepSeekButton');
@@ -501,18 +501,20 @@ appendButton.addEventListener('click', () => {
                 // Copy the text to clipboard
                 await navigator.clipboard.writeText(preparedText);
 
-                // Send a message to the Chrome extension to open DeepSeek
-                chrome.runtime.sendMessage(
-                  "YOUR_EXTENSION_ID", // Replace with your extension's ID
-                  { action: "openDeepSeek" },
-                  (response) => {
-                    if (response && response.success) {
-                      alert('DeepSeek opened successfully. Please paste the text.');
+                // Open DeepSeek chat window
+                const deepSeekURL = "https://chat.deepseek.com"; // Replace with the actual DeepSeek chat URL
+                const deepSeekWindow = window.open(deepSeekURL, '_blank');
+
+                // Wait for the DeepSeek window to load
+                setTimeout(() => {
+                    if (deepSeekWindow) {
+                        // Attempt to paste the text into DeepSeek's input field
+                        deepSeekWindow.focus(); // Focus on the new window
+                        alert('הטקסט הועתק ללוח. אנא הדביקו אותו בחלון DeepSeek שנפתח.');
                     } else {
-                      alert('Failed to open DeepSeek. Please check the extension.');
+                        alert('לא ניתן לפתוח את חלון DeepSeek. אנא בדוק את חסימת חלונות קופצים בדפדפן.');
                     }
-                  }
-                );
+                }, 2000); // Wait 2 seconds for the window to load
             } catch (err) {
                 console.error('שגיאה בעת העתקת הטקסט או פתיחת DeepSeek:', err);
                 alert('לא הצלחנו להעתיק את הטקסט או לפתוח את DeepSeek. נסה שוב.');
