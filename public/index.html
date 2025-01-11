@@ -516,6 +516,16 @@ updateSpeedDisplay();
             console.error("Error playing silent MP3:", error);
         });
     });
+	  // Listen for responses from the content script
+window.addEventListener('message', (event) => {
+  if (event.data.action === 'sendToDeepSeekResponse') {
+    if (event.data.success) {
+      alert('הטקסט נשלח ל-DeepSeek בהצלחה!');
+    } else {
+      alert('שגיאה בשליחת הטקסט ל-DeepSeek.');
+    }
+  }
+});
   </script>
 </body>
 </html>
