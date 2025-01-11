@@ -92,36 +92,35 @@
       justify-content: space-between;
       margin-top: 20px;
     }
-	.text-appender-section {
-  margin-top: 20px; /* Adds space between the iframe and the tool */
-  text-align: right;
-}
 
-.text-appender-section textarea,
-.text-appender-section button {
-  direction: rtl; /* Ensures proper RTL behavior */
-  text-align: right; /* Aligns text inside elements to the right */
-}
+    .text-appender-section {
+      margin-top: 20px;
+      text-align: right;
+    }
 
-.text-appender-section label {
-  display: block;
-  text-align: right; /* Aligns the label to the right */
-  margin-bottom: 5px;
-}
+    .text-appender-section textarea,
+    .text-appender-section button {
+      direction: rtl;
+      text-align: right;
+    }
 
-.button-container {
-  display: flex;
-  justify-content: flex-start; /* Align buttons to the right in RTL */
-  gap: 10px; /* Adds space between the buttons */
-  margin-top: 10px;
-}
+    .text-appender-section label {
+      display: block;
+      text-align: right;
+      margin-bottom: 5px;
+    }
 
-button {
-  flex: none; /* Ensures buttons keep their intrinsic size */
-  padding: 10px 20px;
-}
+    .button-container {
+      display: flex;
+      justify-content: flex-start;
+      gap: 10px;
+      margin-top: 10px;
+    }
 
-
+    button {
+      flex: none;
+      padding: 10px 20px;
+    }
 
     button {
       flex: 1;
@@ -163,12 +162,12 @@ button {
       border-radius: 5px;
       overflow: hidden;
     }
-	#currentSpeed {
-  font-size: 1rem;
-  margin-top: 10px;
-  color: var(--primary-color);
-}
 
+    #currentSpeed {
+      font-size: 1rem;
+      margin-top: 10px;
+      color: var(--primary-color);
+    }
 
     .progress-bar {
       height: 100%;
@@ -182,18 +181,18 @@ button {
       color: var(--primary-color);
       margin-bottom: 10px;
     }
-	.bottom-image-section {
-  text-align: center; /* Center the image horizontally */
-  margin-top: 20px; /* Space between the image and the rest of the content */
-}
 
-.bottom-image {
-  max-width: 150px; /* Set a fixed maximum width for the image */
-  width: 10%; /* You can use a percentage or a fixed width */
-  height: auto; /* Maintain the aspect ratio */
-  display: inline-block;
-}
+    .bottom-image-section {
+      text-align: center;
+      margin-top: 20px;
+    }
 
+    .bottom-image {
+      max-width: 150px;
+      width: 10%;
+      height: auto;
+      display: inline-block;
+    }
 
     .right-panel {
       width: 600px;
@@ -231,10 +230,6 @@ button {
       width: 100%;
       margin: 0;
     }
-	.text-appender-section {
-  margin-top: 20px; /* Adjust this value to add more or less space */
-}
-
 
     textarea {
       width: 100%;
@@ -269,16 +264,15 @@ button {
         </audio>
       </div>
 
-     <div class="controls">
-  <button id="skipBack30" disabled>← 30s</button>
-  <button id="skipBack10" disabled>← 10s</button>
-  <button id="speedDown" disabled>מהירות -</button>
-  <button id="speedUp" disabled>מהירות +</button>
-  <button id="skipForward10" disabled>10s →</button>
-  <button id="skipForward30" disabled>30s →</button>
-</div>
-<div id="currentSpeed">Speed: 1x</div>
-
+      <div class="controls">
+        <button id="skipBack30" disabled>← 30s</button>
+        <button id="skipBack10" disabled>← 10s</button>
+        <button id="speedDown" disabled>מהירות -</button>
+        <button id="speedUp" disabled>מהירות +</button>
+        <button id="skipForward10" disabled>10s →</button>
+        <button id="skipForward30" disabled>30s →</button>
+      </div>
+      <div id="currentSpeed">Speed: 1x</div>
 
       <div class="progress-container">
         <div class="percentage" id="percentage">0%</div>
@@ -289,38 +283,37 @@ button {
     </main>
 
     <div class="right-panel" dir="rtl">
-  <h2>איך להשתמש:</h2>
-  <ul>
-    <li>0. אם זאת פעם ראשונה שאתם משתמשים באתר על מחשב זה, וטרם התקנתם את התוכנה vbcable (כבל וירטואלי), אנא לחצו 
-      <a href="https://app.box.com/index.php?rm=box_download_shared_file&shared_name=a8xeejvdfzwhj7ccpk9a53aodt38mft1&file_id=f_1745692108249">כאן</a> 
-      על מנת להוריד ולהתקין אותה.
-    </li>
-    <li>1. אחרי שהתקנתם, או במידה והתוכנה מותקנת כבר, לחצו
-      <a id="volumeSettingsLink" href="#">כאן</a>
-      כדי לפתוח את הגדרות הצלילים.
-    </li>
-    <li>2. שימו לב שכל השמע שיושמע בדפדפן בו אתם משתמשים לתמלול יועבר למתמלל, לכן אם ברצונכם להשתמש בדפדפן לצורך שמע במהלך התמלול, כדאי להשתמש בדפדפן אחר. (שימוש בדפדפן אחר שאינכם משתמשים בו בדרך כלל, מועיל גם לכך שאין צורך לשנות כל פעם את הגדרות הצלילים).</li>
-    <li>3. בהגדרות הצלילים, בתפריטי הקלט והפלט שליד הדפדפן שבו אתם משתמשים בחרו ב VB-Audio Virtual Cable (סה"כ שני תפריטים, אחד לקלט ואחד לפלט).</li>
-    <li>4. בחרו קובץ שמע אותו ברצונכם לתמלל.</li>
-    <li>5. לחצו על המיקרופון כדי להתחיל את התמלול.</li>
-    <li>6. הפעילו את קובץ השמע.</li>
-    <li>7. כעת התמלול אמור להתחיל.</li>
-    <li>8. בסוף התמלול, אם אתם משתמשים בדפדפן הרגיל שלכם, צריך לשנות חזרה את הגדרות הצלילים.</li>
-    <li>9. את הטקסט אפשר לפסק באמצעות GPT ייעודי (שכל מטרתו היא לפסק תכנים)
-      <a href="https://chatgpt.com/g/g-4qZw7pIjR-dot-gpt">כאן</a>.
-      יש בסוף העמוד כלי להכנת הטקטסט לשליחה ל-GPT.
-    </li>
-    <li>10. ייתכן וה-GPT ייעצור באמצע (תלוי באורך הטקסט), בשביל זה יש סקריפט שיהפוך את התגובות לאוטומטיות: 
-      קודם להפעיל את מצב פיתוח (ימין או שמאל למעלה) 
-      <a href="#" id="copyChromeExtensionsLink">כאן</a>
-      (עותק לקישור יועתק ללוח ההעתקה), להתקין את
-      <a href="https://chromewebstore.google.com/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo" target="_blank">זה</a>
-      ואח"כ את <a href="https://update.greasyfork.org/scripts/521497/ChatGPT%20Infinity%20%E2%88%9E.user.js" target="_blank">זה</a>.
-    </li>
-  </ul>
-</div>
+      <h2>איך להשתמש:</h2>
+      <ul>
+        <li>0. אם זאת פעם ראשונה שאתם משתמשים באתר על מחשב זה, וטרם התקנתם את התוכנה vbcable (כבל וירטואלי), אנא לחצו 
+          <a href="https://app.box.com/index.php?rm=box_download_shared_file&shared_name=a8xeejvdfzwhj7ccpk9a53aodt38mft1&file_id=f_1745692108249">כאן</a> 
+          על מנת להוריד ולהתקין אותה.
+        </li>
+        <li>1. אחרי שהתקנתם, או במידה והתוכנה מותקנת כבר, לחצו
+          <a id="volumeSettingsLink" href="#">כאן</a>
+          כדי לפתוח את הגדרות הצלילים.
+        </li>
+        <li>2. שימו לב שכל השמע שיושמע בדפדפן בו אתם משתמשים לתמלול יועבר למתמלל, לכן אם ברצונכם להשתמש בדפדפן לצורך שמע במהלך התמלול, כדאי להשתמש בדפדפן אחר. (שימוש בדפדפן אחר שאינכם משתמשים בו בדרך כלל, מועיל גם לכך שאין צורך לשנות כל פעם את הגדרות הצלילים).</li>
+        <li>3. בהגדרות הצלילים, בתפריטי הקלט והפלט שליד הדפדפן שבו אתם משתמשים בחרו ב VB-Audio Virtual Cable (סה"כ שני תפריטים, אחד לקלט ואחד לפלט).</li>
+        <li>4. בחרו קובץ שמע אותו ברצונכם לתמלל.</li>
+        <li>5. לחצו על המיקרופון כדי להתחיל את התמלול.</li>
+        <li>6. הפעילו את קובץ השמע.</li>
+        <li>7. כעת התמלול אמור להתחיל.</li>
+        <li>8. בסוף התמלול, אם אתם משתמשים בדפדפן הרגיל שלכם, צריך לשנות חזרה את הגדרות הצלילים.</li>
+        <li>9. את הטקסט אפשר לפסק באמצעות GPT ייעודי (שכל מטרתו היא לפסק תכנים)
+          <a href="https://chatgpt.com/g/g-4qZw7pIjR-dot-gpt">כאן</a>.
+          יש בסוף העמוד כלי להכנת הטקטסט לשליחה ל-GPT.
+        </li>
+        <li>10. ייתכן וה-GPT ייעצור באמצע (תלוי באורך הטקסט), בשביל זה יש סקריפט שיהפוך את התגובות לאוטומטיות: 
+          קודם להפעיל את מצב פיתוח (ימין או שמאל למעלה) 
+          <a href="#" id="copyChromeExtensionsLink">כאן</a>
+          (עותק לקישור יועתק ללוח ההעתקה), להתקין את
+          <a href="https://chromewebstore.google.com/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo" target="_blank">זה</a>
+          ואח"כ את <a href="https://update.greasyfork.org/scripts/521497/ChatGPT%20Infinity%20%E2%88%9E.user.js" target="_blank">זה</a>.
+        </li>
+      </ul>
+    </div>
   </div>
-
 
   <section>
     <iframe 
@@ -332,38 +325,38 @@ button {
   </section>
 
   <!-- Text Appender Tool Section -->
-<section class="text-appender-section" dir="rtl">
-  <div class="content-container">
-    <main>
-      <h1>הכנה לשליחה ל-DeepSeek</h1>
-      
-      <textarea id="text1" rows="4" placeholder="הדבק כאן את הטקסט..."></textarea>
+  <section class="text-appender-section" dir="rtl">
+    <div class="content-container">
+      <main>
+        <h1>הכנה לשליחה ל-DeepSeek</h1>
+        
+        <textarea id="text1" rows="4" placeholder="הדבק כאן את הטקסט..."></textarea>
 
-      <div class="button-container">
-        <button id="appendButton">הכן טקסט</button>
-        <button id="copyButton" class="hidden">לחץ כאן להעתקה</button>
-        <button id="copyAndOpenDeepSeekButton" class="hidden">העתק ופתח DeepSeek</button>
-      </div>
-    </main>
-  </div>
-</section>
-<section class="bottom-image-section">
-  <img src="./cc.png" alt="Descriptive Alt Text" class="bottom-image">
-</section>
+        <div class="button-container">
+          <button id="appendButton">הכן טקסט</button>
+          <button id="copyButton" class="hidden">לחץ כאן להעתקה</button>
+          <button id="copyAndOpenDeepSeekButton" class="hidden">העתק ופתח DeepSeek</button>
+        </div>
+      </main>
+    </div>
+  </section>
 
-	
+  <section class="bottom-image-section">
+    <img src="./cc.png" alt="Descriptive Alt Text" class="bottom-image">
+  </section>
 
   <script>
-  document.getElementById("copyChromeExtensionsLink").addEventListener("click", (event) => {
-      event.preventDefault(); // Prevent the default link behavior
+    document.getElementById("copyChromeExtensionsLink").addEventListener("click", (event) => {
+      event.preventDefault();
       const chromeURL = "chrome://extensions/";
       navigator.clipboard.writeText(chromeURL).then(() => {
-          alert("קישור 'chrome://extensions/' הועתק ללוח ההעתקה. הדביקו אותו בשורת הכתובת בדפדפן.");
+        alert("קישור 'chrome://extensions/' הועתק ללוח ההעתקה. הדביקו אותו בשורת הכתובת בדפדפן.");
       }).catch(err => {
-          alert("שגיאה בהעתקת הקישור. נסו שוב.");
-          console.error("Clipboard write failed: ", err);
+        alert("שגיאה בהעתקת הקישור. נסו שוב.");
+        console.error("Clipboard write failed: ", err);
       });
-  });	  
+    });
+
     // Audio Player Logic
     const audioFileInput = document.getElementById("audioFile");
     const audioPlayer = document.getElementById("audioPlayer");
@@ -374,110 +367,109 @@ button {
     const skipBack30 = document.getElementById("skipBack30");
     const skipForward10 = document.getElementById("skipForward10");
     const skipForward30 = document.getElementById("skipForward30");
-	const speedUp = document.getElementById("speedUp");
-const speedDown = document.getElementById("speedDown");
-const currentSpeed = document.getElementById("currentSpeed");
+    const speedUp = document.getElementById("speedUp");
+    const speedDown = document.getElementById("speedDown");
+    const currentSpeed = document.getElementById("currentSpeed");
 
+    // Enable speed control buttons when the audio loads
+    audioPlayer.addEventListener("loadedmetadata", () => {
+      skipBack10.disabled = false;
+      skipBack30.disabled = false;
+      skipForward10.disabled = false;
+      skipForward30.disabled = false;
+      speedUp.disabled = false;
+      speedDown.disabled = false;
+    });
 
-// Enable speed control buttons when the audio loads
-audioPlayer.addEventListener("loadedmetadata", () => {
-    skipBack10.disabled = false;
-    skipBack30.disabled = false;
-    skipForward10.disabled = false;
-    skipForward30.disabled = false;
-    speedUp.disabled = false;
-    speedDown.disabled = false;
-});
+    // Function to update the speed display
+    function updateSpeedDisplay() {
+      currentSpeed.textContent = `${audioPlayer.playbackRate.toFixed(1)}x :מהירות`;
+    }
 
-// Function to update the speed display
-function updateSpeedDisplay() {
-    currentSpeed.textContent = `${audioPlayer.playbackRate.toFixed(1)}x :מהירות`;
-}
-
-// Speed up the audio
-speedUp.addEventListener("click", () => {
-    if (audioPlayer.playbackRate < 3) { // Limit to 3x speed
+    // Speed up the audio
+    speedUp.addEventListener("click", () => {
+      if (audioPlayer.playbackRate < 3) {
         audioPlayer.playbackRate += 0.1;
         updateSpeedDisplay();
-    }
-});
+      }
+    });
 
-// Slow down the audio
-speedDown.addEventListener("click", () => {
-    if (audioPlayer.playbackRate > 0.5) { // Limit to 0.5x speed
+    // Slow down the audio
+    speedDown.addEventListener("click", () => {
+      if (audioPlayer.playbackRate > 0.5) {
         audioPlayer.playbackRate -= 0.1;
         updateSpeedDisplay();
-    }
-});
+      }
+    });
 
-// Initialize speed display
-updateSpeedDisplay();
+    // Initialize speed display
+    updateSpeedDisplay();
 
     audioFileInput.addEventListener("change", (event) => {
-        const file = event.target.files[0];
-        if (!file) return;
+      const file = event.target.files[0];
+      if (!file) return;
 
-        if (!file.type.startsWith("audio/")) {
-            fileInfo.textContent = "Please upload a valid audio file.";
-            return;
-        }
+      if (!file.type.startsWith("audio/")) {
+        fileInfo.textContent = "Please upload a valid audio file.";
+        return;
+      }
 
-        fileInfo.textContent = `נבחר: ${file.name}`;
-        const url = URL.createObjectURL(file);
-        audioPlayer.src = url;
+      fileInfo.textContent = `נבחר: ${file.name}`;
+      const url = URL.createObjectURL(file);
+      audioPlayer.src = url;
 
-        audioPlayer.addEventListener("loadedmetadata", () => {
-            skipBack10.disabled = false;
-            skipBack30.disabled = false;
-            skipForward10.disabled = false;
-            skipForward30.disabled = false;
-        });
+      audioPlayer.addEventListener("loadedmetadata", () => {
+        skipBack10.disabled = false;
+        skipBack30.disabled = false;
+        skipForward10.disabled = false;
+        skipForward30.disabled = false;
+      });
 
-        audioPlayer.addEventListener("error", () => {
-            fileInfo.textContent = "Failed to load audio file.";
-        });
+      audioPlayer.addEventListener("error", () => {
+        fileInfo.textContent = "Failed to load audio file.";
+      });
 
-        audioPlayer.load();
+      audioPlayer.load();
     });
 
     audioPlayer.ontimeupdate = () => {
-        const currentTime = audioPlayer.currentTime;
-        const duration = audioPlayer.duration;
+      const currentTime = audioPlayer.currentTime;
+      const duration = audioPlayer.duration;
 
-        if (duration > 0) {
-            const percentage = (currentTime / duration) * 100;
-            progressBar.style.width = `${percentage}%`;
-            percentageDisplay.textContent = `${Math.round(percentage)}%`;
-        }
+      if (duration > 0) {
+        const percentage = (currentTime / duration) * 100;
+        progressBar.style.width = `${percentage}%`;
+        percentageDisplay.textContent = `${Math.round(percentage)}%`;
+      }
     };
 
     skipBack10.addEventListener("click", () => {
-        audioPlayer.currentTime = Math.max(audioPlayer.currentTime - 10, 0);
+      audioPlayer.currentTime = Math.max(audioPlayer.currentTime - 10, 0);
     });
 
     skipBack30.addEventListener("click", () => {
-        audioPlayer.currentTime = Math.max(audioPlayer.currentTime - 30, 0);
+      audioPlayer.currentTime = Math.max(audioPlayer.currentTime - 30, 0);
     });
 
     skipForward10.addEventListener("click", () => {
-        audioPlayer.currentTime = Math.min(audioPlayer.currentTime + 10, audioPlayer.duration);
+      audioPlayer.currentTime = Math.min(audioPlayer.currentTime + 10, audioPlayer.duration);
     });
 
     skipForward30.addEventListener("click", () => {
-        audioPlayer.currentTime = Math.min(audioPlayer.currentTime + 30, audioPlayer.duration);
+      audioPlayer.currentTime = Math.min(audioPlayer.currentTime + 30, audioPlayer.duration);
     });
 
-   // Text Appender Logic
-const appendButton = document.getElementById('appendButton');
-const copyButton = document.getElementById('copyButton');
-const copyAndOpenDeepSeekButton = document.getElementById('copyAndOpenDeepSeekButton');
-const text1 = document.getElementById('text1');
+    // Text Appender Logic
+    const appendButton = document.getElementById('appendButton');
+    const copyButton = document.getElementById('copyButton');
+    const copyAndOpenDeepSeekButton = document.getElementById('copyAndOpenDeepSeekButton');
+    const text1 = document.getElementById('text1');
 
-const fixedText = "הוסף לכל הטקסט סימני פיסוק, כולל חלוקה לפסקאות, בלי לשנות את התוכן:";
+    const fixedText = "הוסף לכל הטקסט סימני פיסוק, כולל חלוקה לפסקאות, בלי לשנות את התוכן:";
 
-appendButton.addEventListener('click', () => {
-    const userInput = text1.value.trim();
-    if (userInput) {
+    appendButton.addEventListener('click', () => {
+      const userInput = text1.value.trim();
+      if (userInput) {
         const preparedText = `${fixedText}\n${userInput}`;
         
         // Show both copy buttons
@@ -486,56 +478,53 @@ appendButton.addEventListener('click', () => {
 
         // Copy to clipboard
         copyButton.addEventListener('click', async () => {
-            try {
-                await navigator.clipboard.writeText(preparedText);
-                alert('הטקסט הועתק ללוח!');
-            } catch (err) {
-                console.error('שגיאה בעת העתקת הטקסט:', err);
-                alert('לא הצלחנו להעתיק את הטקסט. נסה שוב.');
-            }
+          try {
+            await navigator.clipboard.writeText(preparedText);
+            alert('הטקסט הועתק ללוח!');
+          } catch (err) {
+            console.error('שגיאה בעת העתקת הטקסט:', err);
+            alert('לא הצלחנו להעתיק את הטקסט. נסה שוב.');
+          }
         }, { once: true });
 
         // Copy and open DeepSeek
         copyAndOpenDeepSeekButton.addEventListener('click', async () => {
+          const userInput = text1.value.trim();
+          const fixedText = "הוסף לכל הטקסט סימני פיסוק, כולל חלוקה לפסקאות, בלי לשנות את התוכן:";
+          const preparedText = `${fixedText}\n${userInput}`;
+
+          if (userInput) {
             try {
-                // Copy the text to clipboard
-                await navigator.clipboard.writeText(preparedText);
+              // Copy the prepared text to the clipboard
+              await navigator.clipboard.writeText(preparedText);
 
-                // Open DeepSeek chat window
-                const deepSeekURL = "https://chat.deepseek.com"; // Replace with the actual DeepSeek chat URL
-                const deepSeekWindow = window.open(deepSeekURL, '_blank');
+              // Open the DeepSeek site in a new tab
+              window.open("https://chat.deepseek.com", "_blank");
 
-                // Wait for the DeepSeek window to load
-                setTimeout(() => {
-                    if (deepSeekWindow) {
-                        // Attempt to paste the text into DeepSeek's input field
-                        deepSeekWindow.focus(); // Focus on the new window
-                        alert('הטקסט הועתק ללוח. אנא הדביקו אותו בחלון DeepSeek שנפתח.');
-                    } else {
-                        alert('לא ניתן לפתוח את חלון DeepSeek. אנא בדוק את חסימת חלונות קופצים בדפדפן.');
-                    }
-                }, 2000); // Wait 2 seconds for the window to load
+              alert('הטקסט הועתק והחלון של DeepSeek נפתח. אנא וודא שהתוכן הודבק ונשלח.');
             } catch (err) {
-                console.error('שגיאה בעת העתקת הטקסט או פתיחת DeepSeek:', err);
-                alert('לא הצלחנו להעתיק את הטקסט או לפתוח את DeepSeek. נסה שוב.');
+              console.error('Error copying or opening DeepSeek:', err);
+              alert('שגיאה בעת העתקת הטקסט או פתיחת DeepSeek. נסה שוב.');
             }
-        }, { once: true });
-    } else {
-        alert('אנא הדבק טקסט לפני הלחיצה.');
-    }
-});
-	// Silent MP3 playback to trigger volume settings
-    volumeSettingsLink.addEventListener("click", (event) => {
-        event.preventDefault(); // Prevent the default link action
-
-        // Create a silent MP3 source
-        const silentMP3 = new Audio("silent.mp3"); // Provide a valid silent MP3 file path
-        silentMP3.play().then(() => {
-            // Open Windows sound settings
-            window.location.href = "ms-settings:apps-volume";
-        }).catch((error) => {
-            console.error("Error playing silent MP3:", error);
+          } else {
+            alert('אנא הזן טקסט לפני הלחיצה.');
+          }
         });
+      }
+    });
+
+    // Silent MP3 playback to trigger volume settings
+    document.getElementById("volumeSettingsLink").addEventListener("click", (event) => {
+      event.preventDefault();
+
+      // Create a silent MP3 source
+      const silentMP3 = new Audio("silent.mp3");
+      silentMP3.play().then(() => {
+        // Open Windows sound settings
+        window.location.href = "ms-settings:apps-volume";
+      }).catch((error) => {
+        console.error("Error playing silent MP3:", error);
+      });
     });
   </script>
 </body>
