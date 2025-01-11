@@ -500,24 +500,10 @@ appendButton.addEventListener('click', () => {
             try {
                 // Copy the text to clipboard
                 await navigator.clipboard.writeText(preparedText);
-
-                // Open DeepSeek chat window
-                const deepSeekURL = "https://chat.deepseek.com"; // Replace with the actual DeepSeek chat URL
-                const deepSeekWindow = window.open(deepSeekURL, '_blank');
-
-                // Wait for the DeepSeek window to load
-                setTimeout(() => {
-                    if (deepSeekWindow) {
-                        // Attempt to paste the text into DeepSeek's input field
-                        deepSeekWindow.focus(); // Focus on the new window
-                        alert('הטקסט הועתק ללוח. אנא הדביקו אותו בחלון DeepSeek שנפתח.');
-                    } else {
-                        alert('לא ניתן לפתוח את חלון DeepSeek. אנא בדוק את חסימת חלונות קופצים בדפדפן.');
-                    }
-                }, 2000); // Wait 2 seconds for the window to load
+                alert('הטקסט הועתק ללוח!');
             } catch (err) {
-                console.error('שגיאה בעת העתקת הטקסט או פתיחת DeepSeek:', err);
-                alert('לא הצלחנו להעתיק את הטקסט או לפתוח את DeepSeek. נסה שוב.');
+                console.error('שגיאה בעת העתקת הטקסט:', err);
+                alert('לא הצלחנו להעתיק את הטקסט. נסה שוב.');
             }
         }, { once: true });
     } else {
