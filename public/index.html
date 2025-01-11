@@ -357,13 +357,8 @@ button {
   document.getElementById('sendToDeepSeek').addEventListener('click', () => {
   const textToSend = document.getElementById('text1').value.trim();
   if (textToSend) {
-    chrome.runtime.sendMessage({ action: 'sendToDeepSeek', text: textToSend }, (response) => {
-      if (response && response.success) {
-        alert('הטקסט נשלח ל-DeepSeek בהצלחה!');
-      } else {
-        alert('שגיאה בשליחת הטקסט ל-DeepSeek.');
-      }
-    });
+    // Send a message to the content script
+    window.postMessage({ action: 'sendToDeepSeek', text: textToSend }, '*');
   } else {
     alert('אנא הדבק טקסט לפני הלחיצה.');
   }
