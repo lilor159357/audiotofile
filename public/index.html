@@ -335,7 +335,7 @@
         <div class="button-container">
           <button id="appendButton">הכן טקסט</button>
           <button id="copyButton" class="hidden">לחץ כאן להעתקה</button>
-          <button id="copyAndOpenDeepSeekButton">העתק ופתח DeepSeek</button>
+          <button id="triggerDeepSeekButton">הפעל את DeepSeek</button>
         </div>
       </main>
     </div>
@@ -346,6 +346,32 @@
   </section>
 
   <script>
+    document.getElementById('triggerDeepSeekButton').addEventListener('click', () => {
+    const textArea = document.getElementById('text1');
+    const userInput = textArea.value.trim();
+    const fixedText = "הוסף לכל הטקסט סימני פיסוק, כולל חלוקה לפסקאות, בלי לשנות את התוכן:";
+    const preparedText = `${fixedText}\n${userInput}`;
+
+    if (userInput) {
+      // Copy text to clipboard
+      navigator.clipboard.writeText(preparedText)
+        .then(() => {
+          // Send a message to the extension to activate it
+          chrome.runtime.sendMessage({
+            type: 'activate-deepseek',
+            url: 'https://chat.deepseek.com',
+          });
+
+          alert('הטקסט הועתק. DeepSeek יופעל.');
+        })
+        .catch(err => {
+          console.error('Error copying to clipboard:', err);
+          alert('שגיאה בהעתקת הטקסט.');
+        });
+    } else {
+      alert('אנא הזן טקסט לפני הלחיצה.');
+    }
+  });
     document.getElementById("copyChromeExtensionsLink").addEventListener("click", (event) => {
       event.preventDefault();
       const chromeURL = "chrome://extensions/";
@@ -498,11 +524,10 @@
               // Copy the prepared text to the clipboard
               await navigator.clipboard.writeText(preparedText);
 
-              // Send a message to the extension to open the popup
-              chrome.runtime.sendMessage({ action: "openPopup" }, (response) => {
-                console.log(response.status);
-                alert('DeepSeek popup opened.');
-              });
+              // Open the DeepSeek site in a new tab
+              window.open("https://chat.deepseek.com", "_blank");
+
+              alert('הטקסט הועתק והחלון של DeepSeek נפתח. אנא וודא שהתוכן הודבק ונשלח.');
             } catch (err) {
               console.error('Error copying or opening DeepSeek:', err);
               alert('שגיאה בעת העתקת הטקסט או פתיחת DeepSeek. נסה שוב.');
