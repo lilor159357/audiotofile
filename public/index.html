@@ -502,13 +502,17 @@ appendButton.addEventListener('click', () => {
                 await navigator.clipboard.writeText(preparedText);
 
                 // Send a message to the Chrome extension to open DeepSeek
-                chrome.runtime.sendMessage({ action: "openDeepSeek" }, (response) => {
+                chrome.runtime.sendMessage(
+                  "YOUR_EXTENSION_ID", // Replace with your extension's ID
+                  { action: "openDeepSeek" },
+                  (response) => {
                     if (response && response.success) {
-                        alert('DeepSeek opened successfully. Please paste the text.');
+                      alert('DeepSeek opened successfully. Please paste the text.');
                     } else {
-                        alert('Failed to open DeepSeek. Please check the extension.');
+                      alert('Failed to open DeepSeek. Please check the extension.');
                     }
-                });
+                  }
+                );
             } catch (err) {
                 console.error('שגיאה בעת העתקת הטקסט או פתיחת DeepSeek:', err);
                 alert('לא הצלחנו להעתיק את הטקסט או לפתוח את DeepSeek. נסה שוב.');
