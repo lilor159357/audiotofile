@@ -467,7 +467,7 @@ updateSpeedDisplay();
         audioPlayer.currentTime = Math.min(audioPlayer.currentTime + 30, audioPlayer.duration);
     });
 
-    // Text Appender Logic
+   // Text Appender Logic
 const appendButton = document.getElementById('appendButton');
 const copyButton = document.getElementById('copyButton');
 const copyAndOpenDeepSeekButton = document.getElementById('copyAndOpenDeepSeekButton');
@@ -502,12 +502,19 @@ appendButton.addEventListener('click', () => {
                 await navigator.clipboard.writeText(preparedText);
 
                 // Open DeepSeek chat window
-                const deepSeekURL = "https://www.deepseek.com/chat"; // Replace with the actual DeepSeek chat URL
-                window.open(deepSeekURL, '_blank');
+                const deepSeekURL = "https://chat.deepseek.com"; // Replace with the actual DeepSeek chat URL
+                const deepSeekWindow = window.open(deepSeekURL, '_blank');
 
-                // Simulate pasting into DeepSeek's input field (if possible)
-                // Note: This part depends on DeepSeek's web interface and may require additional automation tools.
-                alert('הטקסט הועתק ללוח. אנא הדביקו אותו בחלון DeepSeek שנפתח.');
+                // Wait for the DeepSeek window to load
+                setTimeout(() => {
+                    if (deepSeekWindow) {
+                        // Attempt to paste the text into DeepSeek's input field
+                        deepSeekWindow.focus(); // Focus on the new window
+                        alert('הטקסט הועתק ללוח. אנא הדביקו אותו בחלון DeepSeek שנפתח.');
+                    } else {
+                        alert('לא ניתן לפתוח את חלון DeepSeek. אנא בדוק את חסימת חלונות קופצים בדפדפן.');
+                    }
+                }, 2000); // Wait 2 seconds for the window to load
             } catch (err) {
                 console.error('שגיאה בעת העתקת הטקסט או פתיחת DeepSeek:', err);
                 alert('לא הצלחנו להעתיק את הטקסט או לפתוח את DeepSeek. נסה שוב.');
