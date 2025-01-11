@@ -346,6 +346,29 @@
   </section>
 
   <script>
+    document.getElementById('copyAndOpenDeepSeekButton').addEventListener('click', async () => {
+  const userInput = document.getElementById('text1').value.trim();
+  const fixedText = "הוסף לכל הטקסט סימני פיסוק, כולל חלוקה לפסקאות, בלי לשנות את התוכן:";
+  const preparedText = `${fixedText}\n${userInput}`;
+
+  if (userInput) {
+    try {
+      // Send a message to the extension's background script
+      chrome.runtime.sendMessage({
+        type: 'activate-deepseek',
+        url: 'https://chat.deepseek.com',
+        text: preparedText,
+      });
+
+      alert('הטקסט הועתק והחלון של DeepSeek נפתח. אנא וודא שהתוכן הודבק ונשלח.');
+    } catch (err) {
+      console.error('Error copying or opening DeepSeek:', err);
+      alert('שגיאה בעת העתקת הטקסט או פתיחת DeepSeek. נסה שוב.');
+    }
+  } else {
+    alert('אנא הזן טקסט לפני הלחיצה.');
+  }
+});
     document.getElementById("copyChromeExtensionsLink").addEventListener("click", (event) => {
       event.preventDefault();
       const chromeURL = "chrome://extensions/";
