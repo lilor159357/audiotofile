@@ -346,46 +346,30 @@
   </section>
 
   <script>
-    document.getElementById('triggerDeepSeekButton').addEventListener('click', debounce(async () => {
-  const textArea = document.getElementById('text1');
-  const userInput = textArea.value.trim();
-  const fixedText = "הוסף לכל הטקסט סימני פיסוק, כולל חלוקה לפסקאות, בלי לשנות את התוכן:";
-  const preparedText = `${fixedText}\n${userInput}`;
+    document.getElementById('triggerDeepSeekButton').addEventListener(
+  'click',
+  debounce(async () => {
+    const textArea = document.getElementById('text1');
+    const userInput = textArea.value.trim();
+    const fixedText = "הוסף לכל הטקסט סימני פיסוק, כולל חלוקה לפסקאות, בלי לשנות את התוכן:";
+    const preparedText = `${fixedText}\n${userInput}`;
 
-  if (userInput) {
-    try {
-      // Copy to clipboard
-      await navigator.clipboard.writeText(preparedText);
-
-      // Send activation message to the extension
-      chrome.runtime.sendMessage({
-        type: 'activate-deepseek',
-        url: 'https://chat.deepseek.com'
-      }, () => {
-        if (chrome.runtime.lastError) {
-          console.error('Error sending message:', chrome.runtime.lastError);
-          alert('שגיאה בשליחת ההודעה להרחבה.');
-        } else {
-          alert('הטקסט הועתק. DeepSeek יופעל.');
-        }
-      });
-    } catch (err) {
-      console.error('Error in handler:', err);
-      alert('שגיאה בעת העתקת הטקסט.');
+    if (!userInput) {
+      alert('אנא הזן טקסט לפני הלחיצה.');
+      return;
     }
-  } else {
-    alert('אנא הזן טקסט לפני הלחיצה.');
-  }
-}, 300)); // Debounce with 300ms delay
 
-// Debounce function to prevent rapid multiple executions
-function debounce(func, delay) {
-  let timer;
-  return function (...args) {
-    clearTimeout(timer);
-    timer = setTimeout(() => func.apply(this, args), delay);
-  };
-}
+    try {
+      // Copy text to clipboard
+      await navigator.clipboard.writeText(preparedText);
+      alert('הטקסט הועתק בהצלחה ללוח!');
+    } catch (err) {
+      console.error('Error copying text to clipboard:', err);
+      alert('שגיאה בעת העתקת הטקסט. ודא שהדפדפן מאפשר העתקה.');
+    }
+  }, 300) // Debounce delay of 300ms
+);
+
 
     // Audio Player Logic
     const audioFileInput = document.getElementById("audioFile");
