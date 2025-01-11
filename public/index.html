@@ -497,48 +497,33 @@ appendButton.addEventListener('click', () => {
 
         // Copy and open DeepSeek
         copyAndOpenDeepSeekButton.addEventListener('click', async () => {
-    const userInput = text1.value.trim();
-    const fixedText = "הוסף לכל הטקסט סימני פיסוק, כולל חלוקה לפסקאות, בלי לשנות את התוכן:";
-    const preparedText = `${fixedText}\n${userInput}`;
+            try {
+                // Copy the text to clipboard
+                await navigator.clipboard.writeText(preparedText);
 
-    if (userInput) {
-        try {
-            // Copy the prepared text to the clipboard
-            await navigator.clipboard.writeText(preparedText);
+                // Open DeepSeek chat window
+                const deepSeekURL = "https://chat.deepseek.com"; // Replace with the actual DeepSeek chat URL
+                const deepSeekWindow = window.open(deepSeekURL, '_blank');
 
-            // Open the DeepSeek site in a new tab
-            chrome.tabs.create({ url: "https://chat.deepseek.com" }, (tab) => {
-                // Inject the content script into the opened tab
-                chrome.scripting.executeScript({
-                    target: { tabId: tab.id },
-                    func: () => {
-                        // Paste the clipboard content and simulate a button click
-                        const chatInput = document.getElementById('chat-input');
-                        const sendButton = document.querySelector('div[role="button"].f6d670[aria-disabled="false"]');
-
-                        if (chatInput && sendButton) {
-                            navigator.clipboard.readText().then((clipboardText) => {
-                                chatInput.value = clipboardText;
-                                chatInput.dispatchEvent(new Event('input', { bubbles: true }));
-                                sendButton.click();
-                            });
-                        } else {
-                            console.error('Chat input or send button not found.');
-                        }
-                    },
-                });
-            });
-
-            alert('הטקסט הועתק והחלון של DeepSeek נפתח. אנא וודא שהתוכן הודבק ונשלח.');
-        } catch (err) {
-            console.error('Error copying or opening DeepSeek:', err);
-            alert('שגיאה בעת העתקת הטקסט או פתיחת DeepSeek. נסה שוב.');
-        }
+                // Wait for the DeepSeek window to load
+                setTimeout(() => {
+                    if (deepSeekWindow) {
+                        // Attempt to paste the text into DeepSeek's input field
+                        deepSeekWindow.focus(); // Focus on the new window
+                        alert('הטקסט הועתק ללוח. אנא הדביקו אותו בחלון DeepSeek שנפתח.');
+                    } else {
+                        alert('לא ניתן לפתוח את חלון DeepSeek. אנא בדוק את חסימת חלונות קופצים בדפדפן.');
+                    }
+                }, 2000); // Wait 2 seconds for the window to load
+            } catch (err) {
+                console.error('שגיאה בעת העתקת הטקסט או פתיחת DeepSeek:', err);
+                alert('לא הצלחנו להעתיק את הטקסט או לפתוח את DeepSeek. נסה שוב.');
+            }
+        }, { once: true });
     } else {
-        alert('אנא הזן טקסט לפני הלחיצה.');
+        alert('אנא הדבק טקסט לפני הלחיצה.');
     }
 });
-
 	// Silent MP3 playback to trigger volume settings
     volumeSettingsLink.addEventListener("click", (event) => {
         event.preventDefault(); // Prevent the default link action
