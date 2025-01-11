@@ -342,6 +342,7 @@ button {
       <div class="button-container">
         <button id="appendButton">הכן טקסט</button>
         <button id="copyButton" class="hidden">לחץ כאן להעתקה</button>
+        <button id="sendToDeepSeek">שלח ל-DeepSeek</button> <!-- New Button -->
       </div>
     </main>
   </div>
@@ -353,6 +354,20 @@ button {
 	
 
   <script>
+  document.getElementById('sendToDeepSeek').addEventListener('click', () => {
+  const textToSend = document.getElementById('text1').value.trim();
+  if (textToSend) {
+    chrome.runtime.sendMessage({ action: 'sendToDeepSeek', text: textToSend }, (response) => {
+      if (response && response.success) {
+        alert('הטקסט נשלח ל-DeepSeek בהצלחה!');
+      } else {
+        alert('שגיאה בשליחת הטקסט ל-DeepSeek.');
+      }
+    });
+  } else {
+    alert('אנא הדבק טקסט לפני הלחיצה.');
+  }
+});
   document.getElementById("copyChromeExtensionsLink").addEventListener("click", (event) => {
       event.preventDefault(); // Prevent the default link behavior
       const chromeURL = "chrome://extensions/";
